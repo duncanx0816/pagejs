@@ -8,6 +8,7 @@
 // @match        http*://dp227.xyz/pw/*
 // @match        http*://down.dataaps.com/list.php?name=*
 // @match        http*://ww1.k00ppc.com/*
+// @match        http*://www.juejin.cn/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=fc1y.xyz
 // @grant        unsafeWindow
 // @grant        GM_addStyle
@@ -58,15 +59,31 @@ let init=()=>{
     unsafeWindow.GM_info = GM_info
 }
 
+const juejin=function(){
+    document.querySelector('.recommend-box')
+    document.querySelector('.recommend-box').remove()
+    document.querySelector('.wrap.category-course-recommend').remove()
+    document.querySelector('.article-end').remove()
+    document.querySelector('.sidebar-bd-entry').remove()
+    document.querySelector('.sidebar-block.app-download-sidebar-block.shadow').remove()
+    document.querySelector('.sidebar-block.author-block.pure').remove()
+    document.querySelector('.sidebar-block.related-entry-sidebar-block.shadow').remove()
+    document.querySelector('.main-nav-list').remove()
+}
+
 
 (function() {
     'use strict';
     console.log('test')
-    unsafeWindow.setpos=()=>{}
-    document.querySelectorAll('div.tac').forEach((el)=>{el.parentNode.removeChild(el)})
-    document.querySelectorAll('#td_3733').forEach((el)=>{el.parentElement.hidden=true})
-    document.querySelectorAll(".tr3[align='middle']").forEach((el)=>{el.parentNode.removeChild(el)})
-    document.querySelectorAll('.apd>a').forEach((el)=>{el.parentNode.removeChild(el)})
-    document.querySelectorAll('#td_tpc font').forEach((el)=>{el.parentNode.removeChild(el)})
-    document.querySelectorAll('.tr1.r_one').forEach((el)=>{el.parentNode.removeChild(el)})
+    if(location.host=="juejin.cn"){
+        juejin()
+    }else{
+        unsafeWindow.setpos=()=>{}
+        document.querySelectorAll('div.tac').forEach((el)=>{el.parentNode.removeChild(el)})
+        document.querySelectorAll('#td_3733').forEach((el)=>{el.parentElement.hidden=true})
+        document.querySelectorAll(".tr3[align='middle']").forEach((el)=>{el.parentNode.removeChild(el)})
+        document.querySelectorAll('.apd>a').forEach((el)=>{el.parentNode.removeChild(el)})
+        document.querySelectorAll('#td_tpc font').forEach((el)=>{el.parentNode.removeChild(el)})
+        document.querySelectorAll('.tr1.r_one').forEach((el)=>{el.parentNode.removeChild(el)})    
+    }
 })();
