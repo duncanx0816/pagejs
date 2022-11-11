@@ -10,6 +10,7 @@
 // @match        http*://ww1.k00ppc.com/*
 // @match        http*://juejin.cn/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=fc1y.xyz
+// @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js
 // @grant        unsafeWndiow
 // @grant        window.close
 // @grant        GM_addStyle
@@ -35,6 +36,9 @@
 // @grant        GM_info
 // ==/UserScript==
 
+const jq=$
+unsafeWindow.jq=unsafeWindow.jq?unsafeWindow.jq:jq
+
 const init=()=>{
     unsafeWindow.GM_setValue = GM_setValue
     unsafeWindow.GM_getValue = GM_getValue
@@ -54,32 +58,28 @@ const init=()=>{
     unsafeWindow.GM_getTab = GM_getTab
     unsafeWindow.GM_saveTab = GM_saveTab
     unsafeWindow.GM_getTabs = GM_getTabs
-    usafeWinnotificatindow.GM_on = GM_notification
+    unsafeWindow.GM_on = GM_notification
     unsafeWindow.GM_setClipboard = GM_setClipboard
     unsafeWindow.GM_info = GM_info
 }
 
-const deleteElmByCSS=(str_css)=>{
-    if(document.querySelector(str_css)){
-        document.querySelector(str_css).remove()
-    }
-}
-
 const juejin=()=>{
-    setInterval(()=>{
-        deleteElmByCSS('.wrap.category-course-recommend')
-        deleteElmByCSS('.sidebar-block.author-block.pure')
-        deleteElmByCSS('.recommend-box')
-        deleteElmByCSS('.article-end')
-        deleteElmByCSS('.sidebar-bd-entry')
-        deleteElmByCSS('.sidebar-block.app-download-sidebar-block.shadow')
-        deleteElmByCSS('.sidebar-block.shadow')
-        deleteElmByCSS('.main-nav-list')
-        deleteElmByCSS('.sidebar-block.sticky-block')
-        deleteElmByCSS('.sidebar-block.banner-block')
-    },500)
+    let ntime=100
+    let timer=setInterval(()=>{
+        --ntime
+        if(ntime<0){clearInterval(timer)}
+        jq('.wrap.category-course-recommend').remove()
+        jq('.sidebar-block.author-block.pure').remove()
+        jq('.recommend-box').remove()
+        jq('.article-end').remove()
+        jq('.sidebar-bd-entry').remove()
+        jq('.sidebar-block.app-download-sidebar-block.shadow').remove()
+        jq('.sidebar-block.shadow').remove()
+        jq('.main-nav-list').remove()
+        jq('.sidebar-block.sticky-block').remove()
+        jq('.sidebar-block.banner-block').remove()
+    },100)
 }
-
 
 (function() {
     'use strict';
@@ -89,11 +89,18 @@ const juejin=()=>{
         juejin()
     }else{
         unsafeWindow.setpos=()=>{}
-        document.querySelectorAll('div.tac').forEach((el)=>{el.parentNode.removeChild(el)})
-        document.querySelectorAll('#td_3733').forEach((el)=>{el.parentElement.hidden=true})
-        document.querySelectorAll(".tr3[align='middle']").forEach((el)=>{el.parentNode.removeChild(el)})
-        document.querySelectorAll('.apd>a').forEach((el)=>{el.parentNode.removeChild(el)})
-        document.querySelectorAll('#td_tpc font').forEach((el)=>{el.parentNode.removeChild(el)})
-        document.querySelectorAll('.tr1.r_one').forEach((el)=>{el.parentNode.removeChild(el)})
+        jq("div.tac").remove()
+        jq(".tr3[align='middle']").remove()
+        jq(".apd>a").remove()
+        jq("#td_tpc font").remove()
+        jq(".tr1.r_one").remove()
+        jq("#td_3733").parent().remove()
+        
+        let ntime=100
+        let timer=setInterval(()=>{
+            --ntime
+            if(ntime<0){clearInterval(timer)}
+            jq("#td_3733").parent().remove()
+        },100)
     }
 })();
