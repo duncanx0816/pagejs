@@ -9,6 +9,7 @@
 // @match        http*://down.dataaps.com/list.php?name=*
 // @match        http*://ww1.k00ppc.com/*
 // @match        http*://juejin.cn/*
+// @match        http*://gw3.torlook.info/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=fc1y.xyz
 // @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js
 // @grant        unsafeWndiow
@@ -36,10 +37,10 @@
 // @grant        GM_info
 // ==/UserScript==
 
-const jq=$
-// unsafeWindow.jq=unsafeWindow.jq?unsafeWindow.jq:jq
+const jq = $
+unsafeWindow.jq = unsafeWindow.jq ? unsafeWindow.jq : jq
 
-const init=()=>{
+const init = () => {
     unsafeWindow.GM_setValue = GM_setValue
     unsafeWindow.GM_getValue = GM_getValue
     unsafeWindow.GM_addStyle = GM_addStyle
@@ -63,11 +64,13 @@ const init=()=>{
     unsafeWindow.GM_info = GM_info
 }
 
-const juejin=()=>{
-    let ntime=100
-    let timer=setInterval(()=>{
+const juejin = () => {
+    let ntime = 100
+    let timer = setInterval(() => {
         --ntime
-        if(ntime<0){clearInterval(timer)}
+        if (ntime < 0) {
+            clearInterval(timer)
+        }
         jq('.wrap.category-course-recommend').remove()
         jq('.sidebar-block.author-block.pure').remove()
         jq('.recommend-box').remove()
@@ -78,29 +81,54 @@ const juejin=()=>{
         jq('.main-nav-list').remove()
         jq('.sidebar-block.sticky-block').remove()
         jq('.sidebar-block.banner-block').remove()
-    },100)
+    }, 100)
 }
 
-(function() {
-    'use strict';
-    console.log('test')
+const torlook = () => {
+    let aa = jq("span.magnet > a")
+    aa = [...aa]
+    aa.forEach(
+        a => {
+            let url = `${location.origin}/${a.dataset.src}?fancybox=true`
+            let options = {
+                referrer: location.href,
+                credentials: "include",
+                headers: {}
+            }
+            fetch(url, options).then(response => response.text()).then(data => {
+                jq(a).replaceWith(jq("<a/>", {
+                    class: "dl magneto ut-download-url",
+                    href: `magnet:${data.split("magnet:")[1].split("'")[0]}`
+                }))
+            })
+        }
+    )
+}
 
-    if(location.host=="juejin.cn"){
+(function () {
+    'use strict';
+    console.log('av2048')
+
+    if (location.host == "juejin.cn") {
         juejin()
-    }else{
-        unsafeWindow.setpos=()=>{}
+    } else if (location.host == 'gw3.torlook.info') {
+        torlook()
+    } else {
+        unsafeWindow.setpos = () => {}
         jq("div.tac").remove()
         jq(".tr3[align='middle']").remove()
         jq(".apd>a").remove()
         jq("#td_tpc font").remove()
         jq(".tr1.r_one").remove()
         jq("#td_3733").parent().remove()
-        
-        let ntime=100
-        let timer=setInterval(()=>{
+
+        let ntime = 100
+        let timer = setInterval(() => {
             --ntime
-            if(ntime<0){clearInterval(timer)}
+            if (ntime < 0) {
+                clearInterval(timer)
+            }
             jq("#td_3733").parent().remove()
-        },100)
+        }, 100)
     }
 })();
