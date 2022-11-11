@@ -37,7 +37,7 @@
 // ==/UserScript==
 
 const jq=$
-unsafeWindow.jq=unsafeWindow.jq?unsafeWindow.jq:jq
+// unsafeWindow.jq=unsafeWindow.jq?unsafeWindow.jq:jq
 
 const init=()=>{
     unsafeWindow.GM_setValue = GM_setValue
