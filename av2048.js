@@ -65,6 +65,7 @@ const init = () => {
 }
 
 const juejin = () => {
+    let flag = true
     let ntime = 100
     let timer = setInterval(() => {
         --ntime
@@ -81,6 +82,27 @@ const juejin = () => {
         jq('.main-nav-list').remove()
         jq('.sidebar-block.sticky-block').remove()
         jq('.sidebar-block.banner-block').remove()
+        jq('div.guide-collect-popover').hide()
+        jq('div.author-info-block').next('img').hide()
+        jq('#comment-box > div.comment-list-wrapper').hide()
+        jq('#comment-box > div.container.hot-list').hide()
+
+        let btn_old = jq('button.btn.meiqia-btn')
+        if (flag && btn_old.length) {
+            let btn_new = btn_old.clone()
+            btn_old.replaceWith(btn_new) // remove all listeners on btn_old
+            btn_new.click((e) => {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                jq('#comment-box > div.comment-list-wrapper').toggle()
+                jq('#comment-box > div.container.hot-list').toggle()
+            })
+            flag = false
+            console.log('done')
+            // window.getEventListeners(btn).click.forEach((item) => {
+            //     btn.removeEventListener('click', item.listener)
+            // })  // getEventListeners is only available in console
+        }
     }, 100)
 }
 
@@ -100,6 +122,7 @@ const torlook = () => {
                     class: "dl magneto ut-download-url",
                     href: `magnet:${data.split("magnet:")[1].split("'")[0]}`
                 }))
+                console.log(`magnet:${data.split("magnet:")[1].split("'")[0]}`)
             })
         }
     )
