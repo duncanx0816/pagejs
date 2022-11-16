@@ -112,7 +112,7 @@ async function parse(a) {
         let link = a.href.split("openFullWindowHaveBarForWF('")[1].split('%27,')[0]
         link = new URL(link, location).href
         let requestid = new URL(link, location).searchParams.get('requestid')
-        let w = GM_openInTab(link)
+        let w = GM_openInTab(link,{active:true})
 
         let timer = setInterval(() => {
             if (localStorage[requestid]) {
@@ -172,9 +172,9 @@ async function downloadPack({ prefix, infos }) {
     zip.generateAsync({
         type: 'blob'
     }).then(function (content) {
+        saveAs(content, `${prefix}.zip`);
         let requestid = new URL(location).searchParams.get('requestid')
         localStorage.setItem(requestid, 1)
-        saveAs(content, `${prefix}.zip`);
     });
 }
 
