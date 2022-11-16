@@ -29,13 +29,157 @@
 // @grant        GM_registerMenuCommand
 // @grant        GM_unregisterMenuCommand
 // @grant        GM_info
-// @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js
+// @require      https://cdnjs.cloudflare.com/ajax/libs/jq/3.4.1/jq.min.js
+// @require https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/jszip/3.7.1/jszip.min.js
+// @require https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/FileSaver.js/2.0.5/FileSaver.min.js
+// @require file://C:\Users\Administrator\Desktop\Untitled-1.js
 // ==/UserScript==
 
-const jq = $
-unsafeWindow.jq = unsafeWindow.jq ? unsafeWindow.jq : jq
 
-let init=()=>{
+(function () {
+    'use strict';
+    GM_log('cangL')
+    init();
+    const jq = unsafeWindow.jQuery
+    unsafeWindow.jq = unsafeWindow.jq ? unsafeWindow.jq : jq
+    unsafeWindow.parse_index = parse_index
+
+
+    switch (location.pathname.split('/')[1]) {
+        case 'workflow':
+            parse_detail().then(data => downloadPack(data)).then(() => {
+                console.log('done')
+            });
+        case 'wui':
+            unsafeWindow.parse_index();
+        default:
+            console.log()
+    }
+})();
+
+
+function parse_index() {
+    jq('#_DialogDiv_1668604952597').hide()
+    let obj = {};
+    (async () => {
+        for await (let info of pages()) {
+            console.log(info)
+        }
+    })().then(() => {
+        for (let k of Object.keys(localStorage)) {
+            obj[k] = localStorage.getItem(k)
+        }
+        let blob = new Blob([unsafeWindow.JSON.encode(obj)], {
+            type: 'text/html'
+        });
+        let a = jq('<a/>', {
+            download: 'info.json'
+        })[0]
+        a.href = URL.createObjectURL(blob);
+        a.click()
+    })
+}
+
+async function parse_links(){
+    let aa;
+    return new Promise((resolve,reject)=>{
+        let ntime=10
+        let timer=setInterval(() => {
+            if(--ntime<0){clearInterval(timer)}
+            aa = jq("iframe#mainFrame").contents().find('td.reqdetail>a.ellipsis')
+            if(aa.length >0){
+                resolve(Array.from(aa))
+                clearInterval(timer)
+            }
+        }, 1000);
+    })
+}
+
+
+async function* pages() {
+    let aa;
+    aa = await parse_links()
+    console.log(aa.length)
+    aa = Array.from(aa)
+    for (let idx = 0; idx < aa.length; idx++) {
+        await parse(aa[idx])
+        yield `${idx+1} of ${aa.length}`
+    }
+}
+
+async function parse(a) {
+    return new Promise((resolve, reject) => {
+        let link = a.href.split("openFullWindowHaveBarForWF('")[1].split('%27,')[0]
+        link = new URL(link, location).href
+        let requestid = new URL(link, location).searchParams.get('requestid')
+        let w = GM_openInTab(link)
+
+        let timer = setInterval(() => {
+            if (localStorage[requestid]) {
+                w.close()
+                clearInterval(timer)
+                resolve(requestid)
+            }
+        }, 1000)
+    })
+}
+
+
+async function parse_detail() {
+    // location="http://116.62.194.237/workflow/request/ViewRequest.jsp?requestid=37563&isovertime=0"
+    return new Promise((resolve, reject) => {
+        let ntime = 30
+        let timer = setInterval(() => {
+            if (--ntime < 0) clearInterval(timer)
+            let requestid = new URL(location).searchParams.get('requestid')
+            prefix = jq("iframe#bodyiframe").contents().find('#field8714span')[0].textContent
+
+            let infos = []
+            let tds = jq("iframe#bodyiframe").contents().find('.fieldvalueClass')
+            for (let td of Array.from(tds)) {
+                try {
+                    let filename = jq('span>a', td).text()
+                    let fileid = jq('nobr>a', td)[0].getAttribute('onclick').split("downloads('")[1].split("'")[0]
+                    let url = new URL(`/weaver/weaver.file.FileDownload?f_weaver_belongto_userid=61&f_weaver_belongto_usertype=0&fileid=${fileid}&download=1&requestid=${requestid}&fromrequest=1`, location)
+                    infos.push({
+                        filename,
+                        url: url.href
+                    })
+                } catch (error) {}
+            }
+            clearInterval(timer)
+            resolve({
+                prefix,
+                infos
+            })
+        }, 1000)
+    })
+}
+
+
+async function downloadPack({ prefix, infos }) {
+    var zip = new JSZip();
+    for (const info of infos) {
+        zip.file(info.filename, fetch(info.url).then(
+            response => response.blob()).then(
+            data => {
+                console.log(data);
+                return data
+            }
+        ));
+    }
+
+    zip.generateAsync({
+        type: 'blob'
+    }).then(function (content) {
+        let requestid = new URL(location).searchParams.get('requestid')
+        localStorage.setItem(requestid, 1)
+        saveAs(content, `${prefix}.zip`);
+    });
+}
+
+
+function init() {
     unsafeWindow.GM_setValue = GM_setValue
     unsafeWindow.GM_getValue = GM_getValue
     unsafeWindow.GM_addStyle = GM_addStyle
@@ -58,91 +202,3 @@ let init=()=>{
     unsafeWindow.GM_unregisterMenuCommand = GM_unregisterMenuCommand
     unsafeWindow.GM_info = GM_info
 }
-
-
-(function() {
-    'use strict';
-    init();
-    GM_log('test')
-    unsafeWindow.parse_detail=parse_detail
-    unsafeWindow.parse_index=parse_index
-
-
-    $(document).ready(function(){
-        console.log('begin')
-        switch(location.pathname.split('/')[1]){
-            case 'workflow': unsafeWindow.parse_detail(); break;
-            // case 'wui': unsafeWindow.parse_index(); break;
-            default: console.log(location.pathname.split('/')[1])
-        }
-        console.log('end')
-    })
-})();
-
-
-function parse_index(){
-    async function parse(a){
-        return new Promise((resolve, reject)=>{
-            let link=a.href.split("openFullWindowHaveBarForWF('")[1].split('%27,')[0]
-            link=new URL(link, location).href
-            let requestid=new URL(link,location).searchParams.get('requestid')
-            let w=GM_openInTab(link)
-
-            let timer=setInterval(() =>{
-                if(localStorage[requestid]){
-                    w.close()
-                    clearInterval(timer)
-                    resolve(requestid)
-                }
-            },1000)
-            })
-    }
-
-
-    async function* pages(){
-        let aa=jQuery("iframe#mainFrame").contents().find('td.reqdetail>a.ellipsis')
-        for(let idx in Array.from(aa)){
-            await parse(aa[idx])
-            yield `${idx+1} of ${aa.length}`
-        }
-    }
-
-    let obj={};
-    (async ()=>{
-        for await (let info of pages()){
-            console.log(info)
-        }
-    })().then(()=>{
-        for(let k of Object.keys(localStorage)){
-            obj[k]=JSON.decode(localStorage.getItem(k))
-        }
-        let blob = new Blob([JSON.encode(obj)], {type: 'text/html'});
-        let a=jq('<a/>',{download:'info.json'})[0]
-        a.href = URL.createObjectURL(blob);
-        a.click()
-    })
-}
-
-
-function parse_detail(){
-    let ntime=10
-    let timer=setInterval(() => {
-        if(--ntime<0)clearInterval(timer)
-        try {
-            let obj={links:[]}
-            obj.title=jQuery("iframe#bodyiframe").contents().find('#field8714span')[0].textContent
-            let requestid=new URL(location).searchParams.get('requestid')
-            let aa=jQuery("iframe#bodyiframe").contents().find('nobr > a')
-            for(let a of Array.from(aa)){
-                let fileid=a.getAttribute('onclick').split("downloads('")[1].split("'")[0]
-                let link= new URL(`/weaver/weaver.file.FileDownload?f_weaver_belongto_userid=61&f_weaver_belongto_usertype=0&fileid=${fileid}&download=1&requestid=${requestid}&fromrequest=1`,location)
-                obj.links.push(link.href)
-            }
-
-            localStorage.setItem(requestid,JSON.stringify(obj))
-            clearInterval(timer)
-        } catch (error) {
-        }
-    }, 1000)
-}
-
