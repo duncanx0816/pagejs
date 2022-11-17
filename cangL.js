@@ -32,7 +32,7 @@
 // @require      https://cdnjs.cloudflare.com/ajax/libs/jq/3.4.1/jq.min.js
 // @require https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/jszip/3.7.1/jszip.min.js
 // @require https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/FileSaver.js/2.0.5/FileSaver.min.js
-// @require file://C:\Users\Administrator\Desktop\Untitled-1.js
+// @require file://C:\Users\lckfb-xdk\Desktop\Untitled-1.js
 // ==/UserScript==
 
 
@@ -40,26 +40,57 @@
     'use strict';
     GM_log('cangL')
     init();
-    const jq = unsafeWindow.jQuery
-    unsafeWindow.jq = unsafeWindow.jq ? unsafeWindow.jq : jq
+    unsafeWindow.jq = unsafeWindow.jq ? unsafeWindow.jq : unsafeWindow.jQuery
     unsafeWindow.parse_index = parse_index
-
+    unsafeWindow.parse_detail = parse_detail
 
     switch (location.pathname.split('/')[1]) {
         case 'workflow':
-            parse_detail().then(data => downloadPack(data)).then(() => {
-                console.log('done')
-            });
-        case 'wui':
-            unsafeWindow.parse_index();
+            parse_detail().then(data=>{console.log(data)})
+        // case 'wui':
+        //     parse_index();
         default:
             console.log()
     }
 })();
 
 
+async function parse_detail() {
+    // location="http://116.62.194.237/workflow/request/ViewRequest.jsp?requestid=37563&isovertime=0"
+    return new Promise((resolve, reject) => {
+        let ntime = 10
+        let timer = setInterval(() => {
+            if (--ntime < 0) clearInterval(timer)
+            try {
+                let requestid = new URL(location).searchParams.get('requestid')
+                let prefix = document.querySelector("iframe#bodyiframe").contentWindow.document.body.querySelector('#field8714span').textContent
+        
+                let infos = []
+                let tds = document.querySelector("iframe#bodyiframe").contentWindow.document.body.querySelectorAll('.fieldvalueClass')
+                for (let td of Array.from(tds)) {
+                    try {
+                        let filename = td.querySelector('span>a').text
+                        let fileid = td.querySelector('nobr>a').getAttribute('onclick').split("downloads('")[1].split("'")[0]
+                        let url = new URL(`/weaver/weaver.file.FileDownload?f_weaver_belongto_userid=61&f_weaver_belongto_usertype=0&fileid=${fileid}&download=1&requestid=${requestid}&fromrequest=1`, location)
+                        infos.push({
+                            filename,
+                            url: url.href
+                        })
+                    } catch (error) {}
+                }
+                localStorage.setItem(requestid, JSON.stringify({prefix,infos}))
+                clearInterval(timer)
+                resolve({
+                    prefix,
+                    infos
+                })
+            } catch (error) { }
+        }, 1000)
+    })
+}
+
+
 function parse_index() {
-    jq('#_DialogDiv_1668604952597').hide()
     let obj = {};
     (async () => {
         for await (let info of pages()) {
@@ -67,17 +98,24 @@ function parse_index() {
         }
     })().then(() => {
         for (let k of Object.keys(localStorage)) {
-            obj[k] = localStorage.getItem(k)
+            obj[k] = JSON.decode(localStorage.getItem(k))
         }
-        let blob = new Blob([unsafeWindow.JSON.encode(obj)], {
+        let blob = new Blob([JSON.encode(obj)], {
             type: 'text/html'
         });
-        let a = jq('<a/>', {
-            download: 'info.json'
-        })[0]
+        let a = document.createElement('a');
+        a.download='info.json';
         a.href = URL.createObjectURL(blob);
         a.click()
     })
+}
+
+async function* pages() {
+    let aa = await parse_links()
+    for (let idx = 0; idx < aa.length; idx++) {
+        await parse(aa[idx])
+        yield `${idx+1} of ${aa.length}`
+    }
 }
 
 async function parse_links(){
@@ -86,8 +124,9 @@ async function parse_links(){
         let ntime=10
         let timer=setInterval(() => {
             if(--ntime<0){clearInterval(timer)}
-            aa = jq("iframe#mainFrame").contents().find('td.reqdetail>a.ellipsis')
+            aa = document.querySelector("iframe#mainFrame").contentWindow.document.body.querySelectorAll('td.reqdetail>a.ellipsis')
             if(aa.length >0){
+                console.log(aa.length)
                 resolve(Array.from(aa))
                 clearInterval(timer)
             }
@@ -95,64 +134,26 @@ async function parse_links(){
     })
 }
 
-
-async function* pages() {
-    let aa;
-    aa = await parse_links()
-    console.log(aa.length)
-    aa = Array.from(aa)
-    for (let idx = 0; idx < aa.length; idx++) {
-        await parse(aa[idx])
-        yield `${idx+1} of ${aa.length}`
-    }
-}
-
 async function parse(a) {
     return new Promise((resolve, reject) => {
         let link = a.href.split("openFullWindowHaveBarForWF('")[1].split('%27,')[0]
         link = new URL(link, location).href
         let requestid = new URL(link, location).searchParams.get('requestid')
-        let w = GM_openInTab(link,{active:true})
-
-        let timer = setInterval(() => {
-            if (localStorage[requestid]) {
-                w.close()
-                clearInterval(timer)
-                resolve(requestid)
-            }
-        }, 1000)
-    })
-}
-
-
-async function parse_detail() {
-    // location="http://116.62.194.237/workflow/request/ViewRequest.jsp?requestid=37563&isovertime=0"
-    return new Promise((resolve, reject) => {
-        let ntime = 30
-        let timer = setInterval(() => {
-            if (--ntime < 0) clearInterval(timer)
-            let requestid = new URL(location).searchParams.get('requestid')
-            prefix = jq("iframe#bodyiframe").contents().find('#field8714span')[0].textContent
-
-            let infos = []
-            let tds = jq("iframe#bodyiframe").contents().find('.fieldvalueClass')
-            for (let td of Array.from(tds)) {
-                try {
-                    let filename = jq('span>a', td).text()
-                    let fileid = jq('nobr>a', td)[0].getAttribute('onclick').split("downloads('")[1].split("'")[0]
-                    let url = new URL(`/weaver/weaver.file.FileDownload?f_weaver_belongto_userid=61&f_weaver_belongto_usertype=0&fileid=${fileid}&download=1&requestid=${requestid}&fromrequest=1`, location)
-                    infos.push({
-                        filename,
-                        url: url.href
-                    })
-                } catch (error) {}
-            }
-            clearInterval(timer)
-            resolve({
-                prefix,
-                infos
-            })
-        }, 1000)
+        if(localStorage.getItem(requestid)){
+            resolve(requestid)
+        }else{
+            let w = GM_openInTab(link,{active:false})
+    
+            let ntime=100
+            let timer = setInterval(() => {
+                if(--ntime<0)clearInterval(timer)
+                if (localStorage[requestid]) {
+                    w.close()
+                    clearInterval(timer)
+                    resolve(requestid)
+                }
+            }, 1000)
+        }
     })
 }
 
@@ -176,6 +177,26 @@ async function downloadPack({ prefix, infos }) {
         let requestid = new URL(location).searchParams.get('requestid')
         localStorage.setItem(requestid, 1)
     });
+}
+
+function add_script(src){
+    let tag=document.createElement('script')
+    tag.setAttribute('type','text/javascript')
+    tag.src =src;
+    document.body.appendChild(tag)
+}
+
+
+function main(){
+    // batch download base on localStorage.
+    add_script("https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/jszip/3.7.1/jszip.min.js");
+    add_script("https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/FileSaver.js/2.0.5/FileSaver.min.js");
+    let tasks=[];
+    for(let k of Object.keys(localStorage)){
+        let obj=JSON.decode(localStorage.getItem(k))
+        tasks.push(downloadPack(obj))
+    }
+    Promise.all(tasks).then(()=>{console.log('done')})
 }
 
 
