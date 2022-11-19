@@ -19,21 +19,17 @@ class Vixen {
     constructor() {
         this.studio = location.host.split('.')[1]
         this.videos = JSON.parse(localStorage.getItem('videos') || '{}')
-
+        this.buildId = JSON.parse(document.querySelector('script#__NEXT_DATA__').innerHTML).buildId
         this.run()
     }
 
-    run = async () => {
-        await this.until(`document.querySelector('script#__NEXT_DATA__')`)
-        this.infos = JSON.parse(document.querySelector('script#__NEXT_DATA__').innerHTML)
-        this.buildId = this.infos.buildId
-        console.log(this.buildId)
-
+    run = async ()=>{
         document.querySelector('div.VideosSidebar__Main-sc-11jbuek-1.AJrQs').style.display='none';
-        await Promise.all(this.infos.props.pageProps.edges.map(this.parseVideo))
+        let divs=document.querySelectorAll('.Grid__GridContainer-f0cb34-0.bUAzPt.VideoList__VideoListContainer-sc-1u75cgc-0.eliAOo.videos__StyledVideoList-sc-1u2b7uh-3.dTsEcV>div.Grid__Item-f0cb34-1.dSIsBc')
+        await Promise.all(Array.from(divs).map(this.parseVideo))
         let nVideo=Object.keys(this.videos).length
         localStorage.setItem('videos', JSON.stringify(this.videos))
-
+        
         let blob = new Blob([JSON.stringify(this.videos)], {
             type: "application/json"
         });
@@ -41,60 +37,58 @@ class Vixen {
         a.download = `${this.studio}.${(new Date()).getTime()}.${nVideo}.json`
         a.href = URL.createObjectURL(blob)
         a.click()
-
-        alert(`done: ${nVideo}`)
         console.log(`done: ${nVideo}`)
+        // confirm(`done: ${nVideo}`)
     }
 
-    until=async (expr,ntime=20,delta=1000)=>{
-        return new Promise((resolve, reject)=>{
-            let timer=setInterval(()=>{
-                if(eval(expr) || --ntime<0){
-                    clearInterval(timer)
-                    resolve(eval(expr))
-                }
-            }, delta)
-        })
-    }
-
-    parseVideo = async (video) => {
-        let {
-            title,
-            slug,
-            videoId,
-            releaseDate
-        } = video.node
-        releaseDate = releaseDate.split('T')[0]
-        let uuid=`${this.studio}.${releaseDate}`
+    parseVideo=async (elm)=>{
+        let slug=elm.querySelector('.VideoThumbnailPreview__VideoThumbnailLink-sc-1l0c3o7-8.cuAzUN').href.split('/').slice(-1)[0]
         let url_detail = `/_next/data/${this.buildId}/videos/${slug}.json?slug=${slug}`
         let detail = await fetch(url_detail).then(resp => resp.json())
+        let {title,videoId,uuid,releaseDate}=detail.pageProps.video
+        releaseDate = releaseDate.split('T')[0]
+
         let img_url = detail.pageProps.video.images.poster.slice(-1)[0].webp.highdpi.double
         img_url = new URL(img_url, location)
         let poster = img_url.pathname.split('/').slice(-1)[0]
 
-        if (!(uuid in this.videos)) GM_openInTab(img_url.href)
-        this.videos[uuid] = {
-            title,
-            slug,
-            videoId,
-            releaseDate,
-            poster
+        if (!(uuid in this.videos)){
+            setTimeout(() => {
+                GM_openInTab(img_url.href) 
+            }, parseInt(Math.random() * 1000));
         }
+        this.videos[uuid] = { title, slug, videoId, releaseDate, poster }
     }
+
 }
 
+async function until(expr,ntime=20,delta=3000){
+    if(typeof expr == 'string') expr=eval(expr)
+    return new Promise((resolve, reject)=>{
+        let timer=setInterval(()=>{
+            if(expr || --ntime<0){
+                clearInterval(timer)
+                resolve(expr)
+            }
+        }, delta)
+    })
+}
 
-(function () {
+(async function () {
     'use strict';
-
+    await until(`document.querySelector('div.SharedPagination__PaginationContainer-sc-1t976vd-0.ferMtn')`);
+    console.log(JSON.parse(document.querySelector('script#__NEXT_DATA__').innerHTML).buildId)
     new Vixen()
-    let observer = new MutationObserver(() => {
-        setTimeout(()=>{
-            new Vixen()
-        },1000)
+
+    let observer = new MutationObserver(async () => {
+        console.log(`changed: ${(new Date()).getTime()}`)
+        console.log(JSON.parse(document.querySelector('script#__NEXT_DATA__').innerHTML).buildId)
+        await until(`document.querySelector('div.SharedPagination__PaginationContainer-sc-1t976vd-0.ferMtn')`);
+        new Vixen()
     });
     observer.observe(
-        document.querySelector('script#__NEXT_DATA__'), {
+        document.querySelector('div.SharedPagination__PaginationContainer-sc-1t976vd-0.ferMtn'), {
             childList: true
         })
+
 })();
