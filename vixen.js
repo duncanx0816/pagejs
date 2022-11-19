@@ -20,18 +20,20 @@ class Vixen {
         this.studio = location.host.split('.')[1]
         this.videos = JSON.parse(localStorage.getItem('videos') || '{}')
 
-        this.infos = JSON.parse(document.querySelector('script#__NEXT_DATA__').innerHTML)
-        this.buildId = this.infos.buildId
-
         this.run()
     }
 
     run = async () => {
+        await this.until(`document.querySelector('script#__NEXT_DATA__')`)
+        this.infos = JSON.parse(document.querySelector('script#__NEXT_DATA__').innerHTML)
+        this.buildId = this.infos.buildId
+        console.log(this.buildId)
+
         document.querySelector('div.VideosSidebar__Main-sc-11jbuek-1.AJrQs').style.display='none';
         await Promise.all(this.infos.props.pageProps.edges.map(this.parseVideo))
         let nVideo=Object.keys(this.videos).length
         localStorage.setItem('videos', JSON.stringify(this.videos))
-        
+
         let blob = new Blob([JSON.stringify(this.videos)], {
             type: "application/json"
         });
@@ -42,6 +44,17 @@ class Vixen {
 
         alert(`done: ${nVideo}`)
         console.log(`done: ${nVideo}`)
+    }
+
+    until=async (expr,ntime=20,delta=1000)=>{
+        return new Promise((resolve, reject)=>{
+            let timer=setInterval(()=>{
+                if(eval(expr) || --ntime<0){
+                    clearInterval(timer)
+                    resolve(eval(expr))
+                }
+            }, delta)
+        })
     }
 
     parseVideo = async (video) => {
@@ -59,7 +72,7 @@ class Vixen {
         img_url = new URL(img_url, location)
         let poster = img_url.pathname.split('/').slice(-1)[0]
 
-        if (!(uuid in this.videos)) GM_openInTab(img_url.href) 
+        if (!(uuid in this.videos)) GM_openInTab(img_url.href)
         this.videos[uuid] = {
             title,
             slug,
@@ -76,10 +89,12 @@ class Vixen {
 
     new Vixen()
     let observer = new MutationObserver(() => {
-        new Vixen()
+        setTimeout(()=>{
+            new Vixen()
+        },1000)
     });
     observer.observe(
-        document.querySelector('div.SharedPagination__PaginationContainer-sc-1t976vd-0.ferMtn'), {
+        document.querySelector('script#__NEXT_DATA__'), {
             childList: true
         })
 })();
