@@ -65,6 +65,9 @@ async function until(expr,ntime=20,delta=1000){
                 a.innerHTML=h4[0].outerHTML
                 h4.replaceWith(a);
             }
+            
+            let aa=jq('.t.t2');
+            for(let i=1;i<aa.length;i++)jq(aa[i]).hide()
         })
 
         // var linkNode = jq('a[href*=\'viidii\']');
