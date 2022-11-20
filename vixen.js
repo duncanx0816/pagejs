@@ -24,12 +24,12 @@ class Vixen {
     }
 
     run = async ()=>{
-        document.querySelector('div.VideosSidebar__Main-sc-11jbuek-1.AJrQs').style.display='none';
+        if(document.querySelector('div.VideosSidebar__Main-sc-11jbuek-1.AJrQs')) document.querySelector('div.VideosSidebar__Main-sc-11jbuek-1.AJrQs').style.display='none';
         let divs=document.querySelectorAll('.Grid__GridContainer-f0cb34-0.bUAzPt.VideoList__VideoListContainer-sc-1u75cgc-0.eliAOo.videos__StyledVideoList-sc-1u2b7uh-3.dTsEcV>div.Grid__Item-f0cb34-1.dSIsBc')
         await Promise.all(Array.from(divs).map(this.parseVideo))
         let nVideo=Object.keys(this.videos).length
         localStorage.setItem('videos', JSON.stringify(this.videos))
-        
+
         let blob = new Blob([JSON.stringify(this.videos)], {
             type: "application/json"
         });
@@ -45,7 +45,7 @@ class Vixen {
         let slug=elm.querySelector('.VideoThumbnailPreview__VideoThumbnailLink-sc-1l0c3o7-8.cuAzUN').href.split('/').slice(-1)[0]
         let url_detail = `/_next/data/${this.buildId}/videos/${slug}.json?slug=${slug}`
         let detail = await fetch(url_detail).then(resp => resp.json())
-        let {title,videoId,uuid,releaseDate}=detail.pageProps.video
+        let {title,videoId,uuid,releaseDate,modelsSlugged}=detail.pageProps.video
         releaseDate = releaseDate.split('T')[0]
 
         let img_url = detail.pageProps.video.images.poster.slice(-1)[0].webp.highdpi.double
@@ -54,10 +54,10 @@ class Vixen {
 
         if (!(uuid in this.videos)){
             setTimeout(() => {
-                GM_openInTab(img_url.href) 
+                GM_openInTab(img_url.href)
             }, parseInt(Math.random() * 1000));
         }
-        this.videos[uuid] = { title, slug, videoId, releaseDate, poster }
+        this.videos[uuid] = { title, slug, videoId, releaseDate, poster, modelsSlugged }
     }
 
 }
