@@ -63,12 +63,11 @@ class Vixen {
 }
 
 async function until(expr,ntime=20,delta=3000){
-    if(typeof expr == 'string') expr=eval(expr)
     return new Promise((resolve, reject)=>{
         let timer=setInterval(()=>{
-            if(expr || --ntime<0){
+            if(eval(expr) || --ntime<0){
                 clearInterval(timer)
-                resolve(expr)
+                resolve(eval(expr))
             }
         }, delta)
     })
