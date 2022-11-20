@@ -1,157 +1,109 @@
 // ==UserScript==
-// @name         av2048
+// @name         vixen
 // @namespace    http://tampermonkey.net/
 // @version      0.1
 // @description  try to take over the world!
 // @author       You
-// @match        http*://bbs6.fc1y.xyz/2048/*
-// @match        http*://dp227.xyz/pw/*
-// @match        http*://down.dataaps.com/list.php?name=*
-// @match        http*://ww1.k00ppc.com/*
-// @match        http*://juejin.cn/*
-// @match        http*://gw3.torlook.info/*
-// @icon         https://www.google.com/s2/favicons?sz=64&domain=fc1y.xyz
-// @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js
-// @grant        unsafeWndiow
-// @grant        window.close
-// @grant        GM_addStyle
-// @grant        GM_deleteValue
-// @grant        GM_listValues
-// @grant        GM_addValueChangeListener
-// @grant        GM_removeValueChangeListener
-// @grant        GM_setValue
-// @grant        GM_getValue
-// @grant        GM_log
-// @grant        GM_getResourceText
-// @grant        GM_getResourceURL
-// @grant        GM_registerMenuCommand
-// @grant        GM_unregisterMenuCommand
+// @match        https://www.vixen.com/*
+// @match        https://www.blacked.com/*
+// @match        https://www.blackedraw.com/*
+// @match        https://www.tushy.com/*
+// @match        https://www.tushyraw.com/*
+// @match        https://www.deeper.com/*
+// @match        https://www.slayed.com/*
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=vixen.com
 // @grant        GM_openInTab
-// @grant        GM_xmlhttpRequest
-// @grant        GM_download
-// @grant        GM_getTab
-// @grant        GM_saveTab
-// @grant        GM_getTabs
-// @grant        GM_notification
-// @grant        GM_setClipboard
-// @grant        GM_info
 // ==/UserScript==
 
-const jq = $
-unsafeWindow.jq = unsafeWindow.jq ? unsafeWindow.jq : jq
-
-const init = () => {
-    unsafeWindow.GM_setValue = GM_setValue
-    unsafeWindow.GM_getValue = GM_getValue
-    unsafeWindow.GM_addStyle = GM_addStyle
-    unsafeWindow.GM_deleteValue = GM_deleteValue
-    unsafeWindow.GM_listValues = GM_listValues
-    unsafeWindow.GM_addValueChangeListener = GM_addValueChangeListener
-    unsafeWindow.GM_removeValueChangeListener = GM_removeValueChangeListener
-    unsafeWindow.GM_log = GM_log
-    unsafeWindow.GM_getResourceText = GM_getResourceText
-    unsafeWindow.GM_getResourceURL = GM_getResourceURL
-    unsafeWindow.GM_registerMenuCommand = GM_registerMenuCommand
-    unsafeWindow.GM_unregisterMenuCommand = GM_unregisterMenuCommand
-    unsafeWindow.GM_openInTab = GM_openInTab
-    unsafeWindow.GM_xmlhttpRequest = GM_xmlhttpRequest
-    unsafeWindow.GM_download = GM_download
-    unsafeWindow.GM_getTab = GM_getTab
-    unsafeWindow.GM_saveTab = GM_saveTab
-    unsafeWindow.GM_getTabs = GM_getTabs
-    unsafeWindow.GM_on = GM_notification
-    unsafeWindow.GM_setClipboard = GM_setClipboard
-    unsafeWindow.GM_info = GM_info
-}
-
-const juejin = () => {
-    let flag = true
-    let ntime = 100
-    let timer = setInterval(() => {
-        --ntime
-        if (ntime < 0) {
-            clearInterval(timer)
-        }
-        jq('.wrap.category-course-recommend').remove()
-        jq('.sidebar-block.author-block.pure').remove()
-        jq('.recommend-box').remove()
-        jq('.article-end').remove()
-        jq('.sidebar-bd-entry').remove()
-        jq('.sidebar-block.app-download-sidebar-block.shadow').remove()
-        jq('.sidebar-block.shadow').remove()
-        jq('.main-nav-list').remove()
-        jq('.sidebar-block.sticky-block').remove()
-        jq('.sidebar-block.banner-block').remove()
-        jq('div.guide-collect-popover').hide()
-        jq('div.author-info-block').next('img').hide()
-        jq('#comment-box > div.comment-list-wrapper').hide()
-        jq('#comment-box > div.container.hot-list').hide()
-
-        let btn_old = jq('button.btn.meiqia-btn')
-        if (flag && btn_old.length) {
-            let btn_new = btn_old.clone()
-            btn_old.replaceWith(btn_new) // remove all listeners on btn_old
-            btn_new.click((e) => {
-                e.preventDefault();
-                e.stopImmediatePropagation();
-                jq('#comment-box > div.comment-list-wrapper').toggle()
-                jq('#comment-box > div.container.hot-list').toggle()
-            })
-            flag = false
-            console.log('done')
-            // window.getEventListeners(btn).click.forEach((item) => {
-            //     btn.removeEventListener('click', item.listener)
-            // })  // getEventListeners is only available in console
-        }
-    }, 100)
-}
-
-const torlook = () => {
-    let aa = jq("span.magnet > a")
-    aa = [...aa]
-    aa.forEach(
-        a => {
-            let url = `${location.origin}/${a.dataset.src}?fancybox=true`
-            let options = {
-                referrer: location.href,
-                credentials: "include",
-                headers: {}
-            }
-            fetch(url, options).then(response => response.text()).then(data => {
-                jq(a).replaceWith(jq("<a/>", {
-                    class: "dl magneto ut-download-url",
-                    href: `magnet:${data.split("magnet:")[1].split("'")[0]}`
-                }))
-                console.log(`magnet:${data.split("magnet:")[1].split("'")[0]}`)
-            })
-        }
-    )
-}
-
-(function () {
-    'use strict';
-    console.log('av2048')
-
-    if (location.host == "juejin.cn") {
-        juejin()
-    } else if (location.host == 'gw3.torlook.info') {
-        torlook()
-    } else {
-        unsafeWindow.setpos = () => {}
-        jq("div.tac").remove()
-        jq(".tr3[align='middle']").remove()
-        jq(".apd>a").remove()
-        jq("#td_tpc font").remove()
-        jq(".tr1.r_one").remove()
-        jq("#td_3733").parent().remove()
-
-        let ntime = 100
-        let timer = setInterval(() => {
-            --ntime
-            if (ntime < 0) {
-                clearInterval(timer)
-            }
-            jq("#td_3733").parent().remove()
-        }, 100)
+class Vixen {
+    constructor() {
+        this.studio = location.host.split('.')[1]
+        this.videos = JSON.parse(localStorage.getItem('videos') || '{}')
+        this.buildId = JSON.parse(document.querySelector('script#__NEXT_DATA__').innerHTML).buildId
+        this.run()
     }
+
+    run = async ()=>{
+        if(document.querySelector('div.VideosSidebar__Main-sc-11jbuek-1.AJrQs')) document.querySelector('div.VideosSidebar__Main-sc-11jbuek-1.AJrQs').style.display='none';
+        let divs=document.querySelectorAll('.Grid__GridContainer-f0cb34-0.bUAzPt.VideoList__VideoListContainer-sc-1u75cgc-0.eliAOo.videos__StyledVideoList-sc-1u2b7uh-3.dTsEcV>div.Grid__Item-f0cb34-1.dSIsBc')
+        await Promise.all(Array.from(divs).map(this.parseVideo))
+        let nVideo=Object.keys(this.videos).length
+        localStorage.setItem('videos', JSON.stringify(this.videos))
+
+        let blob = new Blob([JSON.stringify(this.videos)], {
+            type: "application/json"
+        });
+        let a = document.createElement('a')
+        a.download = `${this.studio}.${(new Date()).getTime()}.${nVideo}.json`
+        a.href = URL.createObjectURL(blob)
+        a.click()
+        console.log(`done: ${nVideo}`)
+        // confirm(`done: ${nVideo}`)
+    }
+
+    parseVideo=async (elm)=>{
+        let slug=elm.querySelector('.VideoThumbnailPreview__VideoThumbnailLink-sc-1l0c3o7-8.cuAzUN').href.split('/').slice(-1)[0]
+        let url_detail = `/_next/data/${this.buildId}/videos/${slug}.json?slug=${slug}`
+        let detail = await fetch(url_detail).then(resp => resp.json())
+        let {title,videoId,uuid,releaseDate,modelsSlugged}=detail.pageProps.video
+        releaseDate = releaseDate.split('T')[0]
+
+        let img_url = detail.pageProps.video.images.poster.slice(-1)[0].webp.highdpi.double
+        img_url = new URL(img_url, location)
+        let poster = img_url.pathname.split('/').slice(-1)[0]
+
+        if (!(uuid in this.videos)){
+            setTimeout(() => {
+                GM_openInTab(img_url.href)
+            }, parseInt(Math.random() * 1000));
+        }
+        this.videos[uuid] = { title, slug, videoId, releaseDate, poster, modelsSlugged }
+    }
+
+}
+
+async function until(expr,ntime=20,delta=3000){
+    return new Promise((resolve, reject)=>{
+        let timer=setInterval(()=>{
+            if(eval(expr) || --ntime<0){
+                clearInterval(timer)
+                resolve(eval(expr))
+            }
+        }, delta)
+    })
+}
+
+(async function () {
+    'use strict';
+    if(location.href=="https://www.vixen.com/videos"){
+        let urls=[
+            "https://www.deeper.com/videos",
+            "https://www.slayed.com/videos",
+            "https://www.tushy.com/videos",
+            "https://www.tushyraw.com/videos",
+            "https://www.blacked.com/videos",
+            "https://www.blacked.com/videos",
+        ]
+        for(let url of urls){
+            setTimeout(() => {
+                GM_openInTab(url)
+            }, parseInt(Math.random() * 1000));
+        }
+    }
+    
+    await until(`document.querySelector('div.SharedPagination__PaginationContainer-sc-1t976vd-0.ferMtn')`);
+    console.log(JSON.parse(document.querySelector('script#__NEXT_DATA__').innerHTML).buildId)
+    new Vixen()
+
+    let observer = new MutationObserver(async () => {
+        console.log(`changed: ${(new Date()).getTime()}`)
+        console.log(JSON.parse(document.querySelector('script#__NEXT_DATA__').innerHTML).buildId)
+        await until(`document.querySelector('div.SharedPagination__PaginationContainer-sc-1t976vd-0.ferMtn')`);
+        new Vixen()
+    });
+    observer.observe(
+        document.querySelector('div.SharedPagination__PaginationContainer-sc-1t976vd-0.ferMtn'), {
+            childList: true
+        })
+
 })();
