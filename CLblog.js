@@ -26,6 +26,7 @@ async function until(expr,ntime=20,delta=1000){
 
 (async function() {
     'use strict';
+    if(jq("a[href*='viidii']").length) alert(jq("a[href*='viidii']").length)
 
     if (location.host == "t66y.com" && location.pathname.includes('/htm_data/')) {
         var html = jq('.tpc_content:eq(0)').html();
@@ -69,15 +70,6 @@ async function until(expr,ntime=20,delta=1000){
             let aa=jq('.t.t2');
             for(let i=1;i<aa.length;i++)jq(aa[i]).hide()
         })
-
-        // var linkNode = jq('a[href*=\'viidii\']');
-        // if (linkNode.length != 0) {
-        //     linkNode.each((el) => {
-        //         var orginLink = jq(el).attr('href');
-        //         var pureLink = self.KillVill(orginLink);
-        //         jq(el).attr('href', pureLink);
-        //     });
-        // }
 
         let observer = new MutationObserver(async () => {
             setTimeout(() => {
