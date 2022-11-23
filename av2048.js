@@ -145,13 +145,14 @@ const torlook = () => {
         jq(".tr1.r_one").remove()
         jq("#td_3733").parent().remove()
 
-        let els=jq('#read_tpc a[href*="?name="]');
-        if(els.length && els.last()[0].href.match(/name=([\d\w]{32})/)){
-            let hash=els.last()[0].href.match(/name=([\d\w]{32})/)[1]
-            let href_raw=els.last()[0].href
-            let href_new=`${new URL(href_raw).origin}/down.php/${hash}.torrent`
-            let el=jq('<a/>',{href:href_new,text:href_new})
-            els.last().replaceWith(el)
+        for(let el of Array.from(jq('#read_tpc a[href*="?name="]'))){
+            try{
+                let hash=el.href.match(/name=([\d\w]{32})/)[1]
+                let href_raw=el.href
+                let href_new=`${new URL(href_raw).origin}/down.php/${hash}.torrent`
+                let el_new=jq('<a/>',{href:href_new,text:href_new})
+                jq(el).replaceWith(el_new)
+            }catch{}
         }
 
         let ntime = 100
