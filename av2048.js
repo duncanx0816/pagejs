@@ -144,7 +144,22 @@ const torlook = () => {
         jq("#td_tpc font").remove()
         jq(".tr1.r_one").remove()
         jq("#td_3733").parent().remove()
+        
+        // add link to title
+        if(jq('#read_tpc a[href*="?name="]').length==1){
+            try{
+                let el=jq('#read_tpc a[href*="?name="]')[0]
+                let hash=el.href.match(/name=([\d\w]{32})/)[1]
+                let href_raw=el.href
+                let href_new=`${new URL(href_raw).origin}/down.php/${hash}.torrent`
 
+                let a=jq("<a/>",{href:href_new})[0]
+                a.innerHTML=jq('#subject_tpc').clone()[0].outerHTML
+                jq('#subject_tpc').replaceWith(a)
+            }catch{}
+        }
+        
+        // change to read torrent link
         for(let el of Array.from(jq('#read_tpc a[href*="?name="]'))){
             try{
                 let hash=el.href.match(/name=([\d\w]{32})/)[1]
