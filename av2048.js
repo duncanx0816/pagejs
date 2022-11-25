@@ -10,6 +10,7 @@
 // @match        http*://ww1.k00ppc.com/*
 // @match        http*://juejin.cn/*
 // @match        http*://gw3.torlook.info/*
+// @match        https://proxyrarbg.org/torrents.php*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=fc1y.xyz
 // @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js
 // @grant        unsafeWndiow
@@ -128,55 +129,62 @@ const torlook = () => {
     )
 }
 
+const rarbg=()=>{
+    console.log("changed.")
+    let els=jq('table.lista2t > tbody > tr > td:nth-child(4)');
+    els=Array.from(els).filter(e=>e.textContent.includes('MB'));
+    for(let el of els){jq(el).parent().remove()}
+
+    let observer = new MutationObserver(async () => {
+        setTimeout(() => {
+            let els=jq('table.lista2t > tbody > tr > td:nth-child(4)');
+            els=Array.from(els).filter(e=>e.textContent.includes('MB'));
+            for(let el of els){jq(el).parent().remove()}
+        }, 500);
+    });
+    observer.observe(
+        jq('table.lista2t')[0], {
+            childList: true,
+            subtree: true,
+            characterData: true,
+            attributes: true
+        })
+}
+
+const av2048=()=>{
+    unsafeWindow.setpos = () => {}
+    jq("div.tac").remove()
+    jq(".tr3[align='middle']").remove()
+    jq(".apd>a").remove()
+    jq("#td_tpc font").remove()
+    jq(".tr1.r_one").remove()
+    jq("#td_3733").parent().remove()
+
+    let ntime = 100
+    let timer = setInterval(() => {
+        --ntime
+        if (ntime < 0) {
+            clearInterval(timer)
+        }
+        jq("#td_3733").parent().remove()
+    }, 100)
+}
+
 (function () {
     'use strict';
     console.log('av2048')
 
-    if (location.host == "juejin.cn") {
-        juejin()
-    } else if (location.host == 'gw3.torlook.info') {
-        torlook()
-    } else {
-        unsafeWindow.setpos = () => {}
-        jq("div.tac").remove()
-        jq(".tr3[align='middle']").remove()
-        jq(".apd>a").remove()
-        jq("#td_tpc font").remove()
-        jq(".tr1.r_one").remove()
-        jq("#td_3733").parent().remove()
-        
-        // add link to title
-        if(jq('#read_tpc a[href*="?name="]').length==1){
-            try{
-                let el=jq('#read_tpc a[href*="?name="]')[0]
-                let hash=el.href.match(/name=([\d\w]{32})/)[1]
-                let href_raw=el.href
-                let href_new=`${new URL(href_raw).origin}/down.php/${hash}.torrent`
-
-                let a=jq("<a/>",{href:href_new})[0]
-                a.innerHTML=jq('#subject_tpc').clone()[0].outerHTML
-                jq('#subject_tpc').replaceWith(a)
-            }catch{}
-        }
-        
-        // change to read torrent link
-        for(let el of Array.from(jq('#read_tpc a[href*="?name="]'))){
-            try{
-                let hash=el.href.match(/name=([\d\w]{32})/)[1]
-                let href_raw=el.href
-                let href_new=`${new URL(href_raw).origin}/down.php/${hash}.torrent`
-                let el_new=jq('<a/>',{href:href_new,text:href_new})
-                jq(el).replaceWith(el_new)
-            }catch{}
-        }
-
-        let ntime = 100
-        let timer = setInterval(() => {
-            --ntime
-            if (ntime < 0) {
-                clearInterval(timer)
-            }
-            jq("#td_3733").parent().remove()
-        }, 100)
+    switch (location.host) {
+        case "juejin.cn":
+            juejin();
+            break;
+        case "gw3.torlook.info":
+            torlook();
+            break;
+        case "proxyrarbg.org":
+            rarbg();
+            break;
+        default:
+            av2048();
     }
 })();
