@@ -129,17 +129,45 @@ const torlook = () => {
     )
 }
 
+const getTorrent=(url)=>{
+    return fetch(url).then(res=>res.text()).then(doc=>jq('a[href*="/download.php"]',jq(doc))[0].href)
+}
+
 const rarbg=()=>{
-    console.log("changed.")
     let els=jq('table.lista2t > tbody > tr > td:nth-child(4)');
     els=Array.from(els).filter(e=>e.textContent.includes('MB'));
     for(let el of els){jq(el).parent().remove()}
+
+    let els2=jq('table.lista2t > tbody > tr > td:nth-child(2) > a[href*="/torrent/"]');
+    for(let el of els2){
+        let span=jq('<span/>')[0]
+        span.dataset.url=el.href;
+        span.innerHTML=el.innerHTML;
+        span.style.color="#3b63b9";
+        span.style.fontSize="11px";
+        span.style.fontWeight="bold";
+        span.onclick= (e)=>getTorrent(e.target.dataset.url).then((href)=>jq('<a/>',{href})[0].click());
+        jq(el).replaceWith(span);
+    }
+
 
     let observer = new MutationObserver(async () => {
         setTimeout(() => {
             let els=jq('table.lista2t > tbody > tr > td:nth-child(4)');
             els=Array.from(els).filter(e=>e.textContent.includes('MB'));
             for(let el of els){jq(el).parent().remove()}
+
+            let els2=jq('table.lista2t > tbody > tr > td:nth-child(2) > a[href*="/torrent/"]');
+            for(let el of els2){
+                let span=jq('<span/>')[0]
+                span.dataset.url=el.href;
+                span.innerHTML=el.innerHTML;
+                span.style.color="#3b63b9";
+                span.style.fontSize="11px";
+                span.style.fontWeight="bold";
+                span.onclick= (e)=>getTorrent(e.target.dataset.url).then((href)=>jq('<a/>',{href})[0].click());
+                jq(el).replaceWith(span);
+            }
         }, 500);
     });
     observer.observe(
