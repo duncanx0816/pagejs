@@ -10,7 +10,6 @@
 // @match        http*://ww1.k00ppc.com/*
 // @match        http*://juejin.cn/*
 // @match        http*://gw3.torlook.info/*
-// @match        https://proxyrarbg.org/torrents.php*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=fc1y.xyz
 // @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js
 // @grant        unsafeWndiow
@@ -129,90 +128,41 @@ const torlook = () => {
     )
 }
 
-const getTorrent=(url)=>{
-    return fetch(url).then(res=>res.text()).then(doc=>jq('a[href*="/download.php"]',jq(doc))[0].href)
-}
-
-const rarbg=()=>{
-    let els=jq('table.lista2t > tbody > tr > td:nth-child(4)');
-    els=Array.from(els).filter(e=>e.textContent.includes('MB'));
-    for(let el of els){jq(el).parent().remove()}
-
-    let els2=jq('table.lista2t > tbody > tr > td:nth-child(2) > a[href*="/torrent/"]');
-    for(let el of els2){
-        let span=jq('<span/>')[0]
-        span.dataset.url=el.href;
-        span.innerHTML=el.innerHTML;
-        span.style.color="#3b63b9";
-        span.style.fontSize="11px";
-        span.style.fontWeight="bold";
-        span.onclick= (e)=>getTorrent(e.target.dataset.url).then((href)=>jq('<a/>',{href})[0].click());
-        jq(el).replaceWith(span);
-    }
-
-
-    let observer = new MutationObserver(async () => {
-        setTimeout(() => {
-            let els=jq('table.lista2t > tbody > tr > td:nth-child(4)');
-            els=Array.from(els).filter(e=>e.textContent.includes('MB'));
-            for(let el of els){jq(el).parent().remove()}
-
-            let els2=jq('table.lista2t > tbody > tr > td:nth-child(2) > a[href*="/torrent/"]');
-            for(let el of els2){
-                let span=jq('<span/>')[0]
-                span.dataset.url=el.href;
-                span.innerHTML=el.innerHTML;
-                span.style.color="#3b63b9";
-                span.style.fontSize="11px";
-                span.style.fontWeight="bold";
-                span.onclick= (e)=>getTorrent(e.target.dataset.url).then((href)=>jq('<a/>',{href})[0].click());
-                jq(el).replaceWith(span);
-            }
-        }, 500);
-    });
-    observer.observe(
-        jq('table.lista2t')[0], {
-            childList: true,
-            subtree: true,
-            characterData: true,
-            attributes: true
-        })
-}
-
-const av2048=()=>{
-    unsafeWindow.setpos = () => {}
-    jq("div.tac").remove()
-    jq(".tr3[align='middle']").remove()
-    jq(".apd>a").remove()
-    jq("#td_tpc font").remove()
-    jq(".tr1.r_one").remove()
-    jq("#td_3733").parent().remove()
-
-    let ntime = 100
-    let timer = setInterval(() => {
-        --ntime
-        if (ntime < 0) {
-            clearInterval(timer)
-        }
-        jq("#td_3733").parent().remove()
-    }, 100)
-}
-
 (function () {
     'use strict';
     console.log('av2048')
 
-    switch (location.host) {
-        case "juejin.cn":
-            juejin();
-            break;
-        case "gw3.torlook.info":
-            torlook();
-            break;
-        case "proxyrarbg.org":
-            rarbg();
-            break;
-        default:
-            av2048();
+    if (location.host == "juejin.cn") {
+        juejin()
+    } else if (location.host == 'gw3.torlook.info') {
+        torlook()
+    } else {
+        unsafeWindow.setpos = () => {}
+        jq("div.tac").remove()
+        jq(".tr3[align='middle']").remove()
+        jq(".apd>a").remove()
+        jq("#td_tpc font").remove()
+        jq(".tr1.r_one").remove()
+        jq("#td_3733").parent().remove()
+
+        let ntime = 100
+        let timer = setInterval(() => {
+            --ntime
+            if (ntime < 0) {
+                clearInterval(timer)
+            }
+            jq("#td_3733").parent().remove()
+        }, 100)
+
+        let a=jq('#read_tpc > a[href*="?name="]')[0]
+        let hash=a.href.match(/\?name=(\w{32})/)[1]
+        let link=`${new URL(a.href).origin}/down.php/${hash}.torrent`
+        let a_=jq('<a/>',{href:link,text:link})[0]
+        jq(a).replaceWith(a_)
+
+        let h=jq('#subject_tpc')[0]
+        let h_=jq('<a/>',{href:link})[0]
+        h_.innerHTML=h.outerHTML
+        jq(h).replaceWith(h_)
     }
 })();
