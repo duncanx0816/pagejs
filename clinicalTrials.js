@@ -6,9 +6,12 @@
 // @author       You
 // @match        https://clinicaltrials.gov/ct2/show/*
 // @match        https://clin.larvol.com/trial/*
+// @match        https://www.scmp.com/*
+// @match        https://www.weibo.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=clinicaltrials.gov
 // @grant        none
 // ==/UserScript==
+
 
 function clinical_trials(){
     let el = jQuery(
@@ -79,10 +82,34 @@ function updatePage(recs){
     }
 }
 
+function scmp(){
+    setInterval(() => {
+        document.querySelectorAll('.main-images').forEach(e=>e.remove())
+        document.querySelectorAll('.generic-article__body.article-details-type--h3.content--h3').forEach(e=>e.remove())
+        document.querySelectorAll('.generic-article__body.article-details-type--newsletter.content--newsletter').forEach(e=>e.remove())
+        document.querySelectorAll('.generic-article__body.article-details-type--div.content--div.methode-html-wrapper.oembed-wrapper').forEach(e=>e.remove())
+        document.querySelectorAll('.generic-article__body.article-details-type--div.content--div.image-inline-container').forEach(e=>e.remove())
+        document.querySelectorAll('.opinion-article__body.article-details-type--div.content--div.methode-html-wrapper.oembed-wrapper').forEach(e=>e.remove())
+        document.querySelectorAll('.opinion-article__body.article-details-type--newsletter.content--newsletter').forEach(e=>e.remove())
+    }, 1000);
+}
+
+function weibo(){
+    setInterval(() => {
+      if (document.querySelectorAll(".woo-modal-wrap").length > 1) {
+        document.querySelector(".woo-modal-wrap .woo-font").click();
+      }
+    }, 100);
+}
+
 (function () {
     if(location.host=="clin.larvol.com"){
         clin_larvol();
     }else if (location.host == "clinicaltrials.gov") {
       clinical_trials();
+    }else if (location.host == "scmp.com") {
+      scmp();
+    }else if (location.host == "weibo.com") {
+      weibo();
     }
 })();
