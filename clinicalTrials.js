@@ -7,7 +7,7 @@
 // @match        https://clinicaltrials.gov/ct2/show/*
 // @match        https://clin.larvol.com/trial/*
 // @match        https://www.scmp.com/*
-// @match        https://www.weibo.com/*
+// @match        https://weibo.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=clinicaltrials.gov
 // @grant        none
 // ==/UserScript==
@@ -84,6 +84,9 @@ function updatePage(recs){
 
 function scmp(){
     setInterval(() => {
+        document.querySelectorAll('.paywalled-content>div>div').forEach(e=>e.remove())
+        document.querySelectorAll('.main__header-video').forEach(e=>e.remove())
+        document.querySelectorAll('.paywalled-content>div>h3').forEach(e=>e.remove())
         document.querySelectorAll('.main-images').forEach(e=>e.remove())
         document.querySelectorAll('.generic-article__body.article-details-type--h3.content--h3').forEach(e=>e.remove())
         document.querySelectorAll('.generic-article__body.article-details-type--newsletter.content--newsletter').forEach(e=>e.remove())
@@ -107,7 +110,7 @@ function weibo(){
         clin_larvol();
     }else if (location.host == "clinicaltrials.gov") {
       clinical_trials();
-    }else if (location.host == "scmp.com") {
+    }else if (location.host == "www.scmp.com") {
       scmp();
     }else if (location.host == "weibo.com") {
       weibo();
