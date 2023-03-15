@@ -10,6 +10,7 @@
 // @match        http*://ww1.k00ppc.com/*
 // @match        http*://juejin.cn/*
 // @match        http*://gw3.torlook.info/*
+// @match        https://rargb.to/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=fc1y.xyz
 // @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js
 // @grant        unsafeWndiow
@@ -128,6 +129,24 @@ const torlook = () => {
     )
 }
 
+const rargb_to=()=>{
+    for(let a of document.querySelectorAll('.lista2t tr.lista2 td.lista:nth-child(2)>a')){
+        parse_link(a.href).then(magnet=>{
+            if(magnet){
+                a.parentElement.innerHTML=`<a target="_blank" href="${magnet}">[Torrent]</a>  `+a.outerHTML
+            }
+        })
+    }
+}
+
+const parse_link=async (url)=>{
+    let res=await fetch(url).then(res=>res.text())
+    let doc = new DOMParser().parseFromString(res, "text/html")
+    for(let a of doc.querySelectorAll('.lista>a')){
+        if(a.href && a.href.startsWith('magnet:')) return a.href
+    }
+}
+
 (function () {
     'use strict';
     console.log('av2048')
@@ -136,6 +155,8 @@ const torlook = () => {
         juejin()
     } else if (location.host == 'gw3.torlook.info') {
         torlook()
+    } else if (location.host == 'rargb.to') {
+        rargb_to()
     } else {
         unsafeWindow.setpos = () => {}
         jq("div.tac").remove()
