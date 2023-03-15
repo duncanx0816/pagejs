@@ -133,7 +133,7 @@ const rargb_to=()=>{
     for(let a of document.querySelectorAll('.lista2t tr.lista2 td.lista:nth-child(2)>a')){
         parse_link(a.href).then(magnet=>{
             if(magnet){
-                a.parentElement.innerHTML=`<a target="_blank" href="${magnet}">[Torrent]</a>  `+a.outerHTML
+                a.parentElement.innerHTML=`<a target="_blank" href="${magnet}" onclick="navigator.clipboard.writeText(event.target.href); return false">[Torrent]</a>  `+a.outerHTML
             }
         })
     }
