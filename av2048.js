@@ -130,20 +130,20 @@ const torlook = () => {
 }
 
 const rargb_to=()=>{
+    const parse_link=async (url)=>{
+        let res=await fetch(url).then(res=>res.text())
+        let doc = new DOMParser().parseFromString(res, "text/html")
+        for(let a of doc.querySelectorAll('.lista>a')){
+            if(a.href && a.href.startsWith('magnet:')) return a.href
+        }
+    }
+
     for(let a of document.querySelectorAll('.lista2t tr.lista2 td.lista:nth-child(2)>a')){
         parse_link(a.href).then(magnet=>{
             if(magnet){
                 a.parentElement.innerHTML=`<a target="_blank" href="${magnet}" onclick="navigator.clipboard.writeText(event.target.href); return false">[Torrent]</a>  `+a.outerHTML
             }
         })
-    }
-}
-
-const parse_link=async (url)=>{
-    let res=await fetch(url).then(res=>res.text())
-    let doc = new DOMParser().parseFromString(res, "text/html")
-    for(let a of doc.querySelectorAll('.lista>a')){
-        if(a.href && a.href.startsWith('magnet:')) return a.href
     }
 }
 
