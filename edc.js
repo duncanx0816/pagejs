@@ -8,6 +8,7 @@
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=mdsol.com
 // @grant        none
 // @require      file://C:\Users\Administrator\Desktop\edc.js
+// @updateURL    https://raw.githubusercontent.com/duncanx0816/pagejs/main/edc.js
 // ==/UserScript==
 
 
