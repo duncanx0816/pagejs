@@ -7,8 +7,7 @@
 // @match        https://ascentage.mdsol.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=mdsol.com
 // @grant        none
-// @require      file://C:\Users\Administrator\Desktop\edc.js
-// @updateURL    https://raw.githubusercontent.com/duncanx0816/pagejs/main/edc.js
+// @copyright      file://C:\Users\lckfb-xdk\Desktop\edc.js
 // ==/UserScript==
 
 
@@ -35,10 +34,13 @@ const get_sub_page = async (doc, target) => {
 
 class Subject {
     constructor(doc) {
-        this.info = []
+        this.fstDrug;
+        this.eotInfo;
+        this.vstInfo = []
+
         this.doc = doc
         this.subID = this.doc.querySelector('#_ctl0_PgHeader_TabTextHyperlink3').textContent.trim()
-        // this.run()
+        this.run()
     }
 
     run = async () => {
@@ -50,11 +52,16 @@ class Subject {
         let res = aa.map(async a => get_sub_page(this.doc, a.href.split("'")[1]).then(doc => this.parse_vst_date(doc, true)))
         await Promise.all(res)
 
+        await this.parse_1st_drug()
+        await this.parse_eot()
+
         let blob = new Blob(
             [JSON.stringify({
                 subID: this.subID,
                 href: location.href,
-                info: this.info
+                fstDrug: this.fstDrug,
+                vstInfo: this.vstInfo,
+                eotInfo: this.eotInfo,
             })], {
                 type: "application/json"
             }
@@ -74,19 +81,19 @@ class Subject {
             .then((res) => res.text())
             .then((res) => new DOMParser().parseFromString(res, "text/html"));
 
-        let k1 = doc_
+        let k1 = doc
             .querySelectorAll("#_ctl0_Content_R>table")[1]
             .querySelector("tbody>tr>td")
             .textContent.trim();
-        let v1 = doc_
+        let v1 = doc
             .querySelectorAll("#_ctl0_Content_R>table")[1]
             .querySelector("tbody>tr>td:nth-child(3)")
             .textContent.trim();
-        let k2 = doc_
+        let k2 = doc
             .querySelectorAll("#_ctl0_Content_R>table")[2]
             .querySelector("tbody>tr>td")
             .textContent.trim();
-        let v2 = doc_
+        let v2 = doc
             .querySelectorAll("#_ctl0_Content_R>table")[2]
             .querySelector("tbody>tr>td:nth-child(3)")
             .textContent.trim();
@@ -94,7 +101,7 @@ class Subject {
         let res = {}
         res[k1] = v1
         res[k2] = v2
-        return res
+        this.eotInfo= res
     }
 
     parse_vst_date = (doc, sub = false) => {
@@ -117,10 +124,33 @@ class Subject {
                 }
             }
         )
-        this.info = [...this.info, ...res]
+        this.vstInfo = [...this.vstInfo, ...res]
     }
 
+    parse_1st_drug=async ()=>{
+        let url_prefix = location.href.split("/SubjectPage.aspx")[0];
+        let el = this.doc.querySelector( "#_ctl0_LeftNav_EDCTaskList_TblTaskItems tr:nth-child(3)>td:nth-child(2)>a" );
+        let link = new URL(el.href);
+        link= `${url_prefix}/InstancePage.aspx${link.search}`;
+        let res=await fetch(link).then(res=>res.text())
+        let doc = new DOMParser().parseFromString(res, "text/html")
+        let trs=doc.querySelectorAll("#_ctl0_LeftNav_EDCTaskList_TblTaskItems>tbody>tr")
+        let a=trs[trs.length-1].querySelector("td:nth-child(2)>a")
+
+        let link_;
+        if(a.text.trim()=='第1周期服药记录'){
+            link_=new URL(a.href)
+            link_= `${url_prefix}/InstancePage.aspx${link_.search}`
+        }
+
+        if(link_){
+            let res = await fetch(link_).then((res) => res.text());
+            let doc = new DOMParser().parseFromString(res, "text/html");
+            this.fstDrug= doc.querySelector("#log tr:nth-child(2)>td:nth-child(2)>a").text.trim();
+        }
+    }
 }
+
 
 class SubjectList {
     constructor(doc) {
