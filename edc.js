@@ -35,7 +35,7 @@ const get_sub_page = async (doc, target) => {
 class Subject {
     constructor(doc) {
         this.fstDrug;
-        this.eotInfo;
+        this.eotInfo={};
         this.vstInfo = []
 
         this.doc = doc
@@ -74,6 +74,7 @@ class Subject {
     }
 
     parse_eot = async () => {
+        if(this.doc.querySelector('a.leftNaveTableRowLink[title^="治疗终止"]')){
         let link = this.doc.querySelector(
             'a.leftNaveTableRowLink[title^="治疗终止"]'
         ).href;
@@ -102,6 +103,7 @@ class Subject {
         res[k1] = v1
         res[k2] = v2
         this.eotInfo= res
+    }
     }
 
     parse_vst_date = (doc, sub = false) => {
@@ -183,7 +185,7 @@ class SubjectList {
 
     if (location.pathname.endsWith('HomePage.aspx') & location.search.startsWith('?LD_StudySiteID=')) {
         console.log('run')
-        // new SubjectList(document);
+        new SubjectList(document);
     } else if (location.pathname.endsWith('SubjectPage.aspx')) {
         new Subject(document);
     }
