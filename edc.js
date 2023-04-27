@@ -44,6 +44,10 @@ class Subject {
         this.eotInfo = {};
         this.vstInfo = [];
         this.pdInfo = {};
+        this.molecular=[];
+        this.cytogenetic = [];
+        this.mutation = [];
+        this.therapies = [];
 
         this.doc = doc;
         this.subID = this.doc
@@ -64,8 +68,9 @@ class Subject {
             ));
         await Promise.all(res);
 
-        let tasks=this.vstInfo.map(async vst => this.parse_vst_PD(vst[2]))
-        await Promise.all(tasks)
+        await Promise.all(
+          this.vstInfo.map(async (vst) => this.parse_vst_detail(vst[2]))
+        );
 
         // await this.parse_1st_drug();
         // await this.parse_eot();
@@ -79,6 +84,10 @@ class Subject {
                     vstInfo: this.vstInfo,
                     eotInfo: this.eotInfo,
                     pdInfo: this.pdInfo,
+                    therapies: this.therapies,
+                    molecular: this.molecular,
+                    cytogenetic: this.cytogenetic,
+                    mutation: this.mutation,
                 }),
             ], {
                 type: "application/json",
@@ -146,8 +155,44 @@ class Subject {
         this.vstInfo = [...this.vstInfo, ...res];
     };
 
-    parse_vst_PD = async (url) => {
+    parse_vst_detail=async url=>{
         let doc = await get_page(url);
+        await this.parse_vst_PD(doc,url);
+
+        let therapies = await this._parse_vst_detail(doc, "Systemic Therapies");
+        this.therapies=[...this.therapies, ...therapies]
+
+        let molecular = await this._parse_vst_detail(doc, "Molecular");
+        this.molecular=[...this.molecular, ...molecular]
+
+        let cytogenetic = await this._parse_vst_detail(doc, "Cytogenetic");
+        this.cytogenetic=[...this.cytogenetic, ...cytogenetic]
+
+        let mutation = await this._parse_vst_detail(doc, "Mutation");
+        this.mutation=[...this.mutation, ...mutation]
+
+    }
+
+    _parse_vst_detail = async (doc, kw) => {
+        let links = [
+                ...doc.querySelectorAll(
+                    "#_ctl0_LeftNav_EDCTaskList_TblTaskItems a.leftNaveTableRowLink"
+                ),
+            ]
+            .filter((a) => a.textContent.includes(kw))
+            .map((a) => a.href);
+
+        if (links.length) {
+            let doc = await get_page(links[0]);
+            return [...doc.querySelectorAll("#log>tbody>tr")].map(
+              (tr) => [...tr.childNodes].map((td) => td.textContent.trim())
+            ).filter(i=>! i[0].startsWith('Printable'));    
+        }else{
+            return []
+        }
+    };
+
+    parse_vst_PD = async (doc,url) => {
         let links = [
                 ...doc.querySelectorAll(
                     "#_ctl0_LeftNav_EDCTaskList_TblTaskItems a.leftNaveTableRowLink"
