@@ -9,7 +9,7 @@
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=mdsol.com
 // @grant        GM_openInTab
 // @grant        window.close
-// @copyright      file://C:\Users\lckfb-xdk\Desktop\edc.js
+// @require      file://C:\Users\lckfb-xdk\Desktop\edc.js
 // ==/UserScript==
 
 const get_page = async (url) => {
@@ -39,213 +39,229 @@ const get_sub_page = async (doc, target) => {
 
 
 class Subject {
-    constructor(doc) {
-        this.fstDrug;
-        this.eotInfo = {};
-        this.vstInfo = [];
-        this.pdInfo = {};
-        this.molecular=[];
-        this.cytogenetic = [];
-        this.mutation = [];
-        this.therapies = [];
+  constructor(doc) {
+    this.fstDrug;
+    this.eotInfo = {};
+    this.vstInfo = [];
+    this.pdInfo = {};
+    this.molecular = {};
+    this.cytogenetic = {};
+    this.mutation = {};
+    this.therapies = {};
 
-        this.doc = doc;
-        this.subID = this.doc
-            .querySelector("#_ctl0_PgHeader_TabTextHyperlink3")
-            .textContent.trim();
-        this.run();
+    this.doc = doc;
+    this.subID = this.doc
+      .querySelector("#_ctl0_PgHeader_TabTextHyperlink3")
+      .textContent.trim();
+    this.run();
+  }
+
+  run = async () => {
+    let trs = this.doc.querySelectorAll("#GRID tr");
+    this.parse_vst_date(this.doc);
+
+    let aa = trs[trs.length - 1].querySelectorAll("a");
+    aa = [...aa];
+    let res = aa.map(async (a) =>
+      get_sub_page(this.doc, a.href.split("'")[1]).then((doc) =>
+        this.parse_vst_date(doc, true)
+      )
+    );
+    await Promise.all(res);
+
+    await Promise.all(
+      this.vstInfo.map(async (vst) => this.parse_vst_detail(vst[2]))
+    );
+
+    // await this.parse_1st_drug();
+    // await this.parse_eot();
+
+    let blob = new Blob(
+      [
+        JSON.stringify({
+          subID: this.subID,
+          href: location.href,
+          fstDrug: this.fstDrug,
+          vstInfo: this.vstInfo,
+          eotInfo: this.eotInfo,
+          pdInfo: this.pdInfo,
+          therapies: this.therapies,
+          molecular: this.molecular,
+          cytogenetic: this.cytogenetic,
+          mutation: this.mutation,
+        }),
+      ],
+      {
+        type: "application/json",
+      }
+    );
+    let a = this.doc.createElement("a");
+    a.download = `${this.subID}.${new Date().getTime()}.json`;
+    a.href = URL.createObjectURL(blob);
+    a.click();
+    window.close();
+  };
+
+  parse_eot = async () => {
+    if (this.doc.querySelector('a.leftNaveTableRowLink[title^="治疗终止"]')) {
+      let link = this.doc.querySelector(
+        'a.leftNaveTableRowLink[title^="治疗终止"]'
+      ).href;
+      let doc = await fetch(link)
+        .then((res) => res.text())
+        .then((res) => new DOMParser().parseFromString(res, "text/html"));
+
+      let k1 = doc
+        .querySelectorAll("#_ctl0_Content_R>table")[1]
+        .querySelector("tbody>tr>td")
+        .textContent.trim();
+      let v1 = doc
+        .querySelectorAll("#_ctl0_Content_R>table")[1]
+        .querySelector("tbody>tr>td:nth-child(3)")
+        .textContent.trim();
+      let k2 = doc
+        .querySelectorAll("#_ctl0_Content_R>table")[2]
+        .querySelector("tbody>tr>td")
+        .textContent.trim();
+      let v2 = doc
+        .querySelectorAll("#_ctl0_Content_R>table")[2]
+        .querySelector("tbody>tr>td:nth-child(3)")
+        .textContent.trim();
+
+      let res = {};
+      res[k1] = v1;
+      res[k2] = v2;
+      this.eotInfo = res;
+    }
+  };
+
+  parse_vst_date = (doc, sub = false) => {
+    let trs = sub
+      ? doc.querySelectorAll("#_ctl0_Content__ctl0_GRID tr")
+      : doc.querySelectorAll("#GRID tr");
+    let trs_ = [...trs];
+    let res = trs_
+      .slice(0, trs_.length - 1)
+      .map((tr) => {
+        let [, td_vst, td_dt] = tr.querySelectorAll("td");
+        try {
+          let visit = td_vst.textContent.trim();
+          let date = td_dt.textContent.trim();
+          let href =
+            td_vst.querySelector("a") && td_vst.querySelector("a").href;
+          if (date && href && href.startsWith("http")) {
+            return [visit, date, href];
+          }
+        } catch {
+          return;
+        }
+      })
+      .filter((i) => i);
+    this.vstInfo = [...this.vstInfo, ...res];
+  };
+
+  parse_vst_detail = async (url) => {
+    let doc = await get_page(url);
+    await this.parse_vst_PD(doc, url);
+
+    let therapies = await this._parse_vst_detail(doc, "Systemic Therapies");
+    if (therapies.length) {
+      this.therapies[url] = therapies;
     }
 
-    run = async () => {
-        let trs = this.doc.querySelectorAll("#GRID tr");
-        this.parse_vst_date(this.doc);
-
-        let aa = trs[trs.length - 1].querySelectorAll("a");
-        aa = [...aa];
-        let res = aa.map(async (a) =>
-            get_sub_page(this.doc, a.href.split("'")[1]).then((doc) =>
-                this.parse_vst_date(doc, true)
-            ));
-        await Promise.all(res);
-
-        await Promise.all(
-          this.vstInfo.map(async (vst) => this.parse_vst_detail(vst[2]))
-        );
-
-        // await this.parse_1st_drug();
-        // await this.parse_eot();
-
-        let blob = new Blob(
-            [
-                JSON.stringify({
-                    subID: this.subID,
-                    href: location.href,
-                    fstDrug: this.fstDrug,
-                    vstInfo: this.vstInfo,
-                    eotInfo: this.eotInfo,
-                    pdInfo: this.pdInfo,
-                    therapies: this.therapies,
-                    molecular: this.molecular,
-                    cytogenetic: this.cytogenetic,
-                    mutation: this.mutation,
-                }),
-            ], {
-                type: "application/json",
-            }
-        );
-        let a = this.doc.createElement("a");
-        a.download = `${this.subID}.${new Date().getTime()}.json`;
-        a.href = URL.createObjectURL(blob);
-        a.click();
-        window.close();
-    };
-
-    parse_eot = async () => {
-        if (this.doc.querySelector('a.leftNaveTableRowLink[title^="治疗终止"]')) {
-            let link = this.doc.querySelector(
-                'a.leftNaveTableRowLink[title^="治疗终止"]'
-            ).href;
-            let doc = await fetch(link)
-                .then((res) => res.text())
-                .then((res) => new DOMParser().parseFromString(res, "text/html"));
-
-            let k1 = doc
-                .querySelectorAll("#_ctl0_Content_R>table")[1]
-                .querySelector("tbody>tr>td")
-                .textContent.trim();
-            let v1 = doc
-                .querySelectorAll("#_ctl0_Content_R>table")[1]
-                .querySelector("tbody>tr>td:nth-child(3)")
-                .textContent.trim();
-            let k2 = doc
-                .querySelectorAll("#_ctl0_Content_R>table")[2]
-                .querySelector("tbody>tr>td")
-                .textContent.trim();
-            let v2 = doc
-                .querySelectorAll("#_ctl0_Content_R>table")[2]
-                .querySelector("tbody>tr>td:nth-child(3)")
-                .textContent.trim();
-
-            let res = {};
-            res[k1] = v1;
-            res[k2] = v2;
-            this.eotInfo = res;
-        }
-    };
-
-    parse_vst_date = (doc, sub = false) => {
-        let trs = sub ?
-            doc.querySelectorAll("#_ctl0_Content__ctl0_GRID tr") :
-            doc.querySelectorAll("#GRID tr");
-        let trs_ = [...trs];
-        let res = trs_.slice(0, trs_.length - 1).map((tr) => {
-            let [, td_vst, td_dt] = tr.querySelectorAll("td");
-            try {
-                let visit = td_vst.textContent.trim();
-                let date = td_dt.textContent.trim();
-                let href =
-                    td_vst.querySelector("a") && td_vst.querySelector("a").href;
-                if (date && href && href.startsWith('http')) {
-                    return [visit, date, href];
-                }
-            } catch {
-                return;
-            }
-        }).filter(i => i);
-        this.vstInfo = [...this.vstInfo, ...res];
-    };
-
-    parse_vst_detail=async url=>{
-        let doc = await get_page(url);
-        await this.parse_vst_PD(doc,url);
-
-        let therapies = await this._parse_vst_detail(doc, "Systemic Therapies");
-        this.therapies=[...this.therapies, ...therapies]
-
-        let molecular = await this._parse_vst_detail(doc, "Molecular");
-        this.molecular=[...this.molecular, ...molecular]
-
-        let cytogenetic = await this._parse_vst_detail(doc, "Cytogenetic");
-        this.cytogenetic=[...this.cytogenetic, ...cytogenetic]
-
-        let mutation = await this._parse_vst_detail(doc, "Mutation");
-        this.mutation=[...this.mutation, ...mutation]
-
+    let molecular = await this._parse_vst_detail(doc, "Molecular");
+    if (molecular.length) {
+      this.molecular[url] = molecular;
     }
 
-    _parse_vst_detail = async (doc, kw) => {
-        let links = [
-                ...doc.querySelectorAll(
-                    "#_ctl0_LeftNav_EDCTaskList_TblTaskItems a.leftNaveTableRowLink"
-                ),
-            ]
-            .filter((a) => a.textContent.includes(kw))
-            .map((a) => a.href);
+    let cytogenetic = await this._parse_vst_detail(doc, "Cytogenetic");
+    if (cytogenetic.length) {
+      this.cytogenetic[url] = cytogenetic;
+    }
 
-        if (links.length) {
-            let doc = await get_page(links[0]);
-            return [...doc.querySelectorAll("#log>tbody>tr")].map(
-              (tr) => [...tr.childNodes].map((td) => td.textContent.trim())
-            ).filter(i=>! i[0].startsWith('Printable'));    
-        }else{
-            return []
-        }
-    };
+    let mutation = await this._parse_vst_detail(doc, "Mutation");
+    if (mutation.length) {
+      this.mutation[url] = mutation;
+    }
+  };
 
-    parse_vst_PD = async (doc,url) => {
-        let links = [
-                ...doc.querySelectorAll(
-                    "#_ctl0_LeftNav_EDCTaskList_TblTaskItems a.leftNaveTableRowLink"
-                ),
-            ]
-            .filter((a) => a.textContent.includes("Pharmacodynamic"))
-            .map((a) => a.href);
+  _parse_vst_detail = async (doc, kw) => {
+    let links = [
+      ...doc.querySelectorAll(
+        "#_ctl0_LeftNav_EDCTaskList_TblTaskItems a.leftNaveTableRowLink"
+      ),
+    ]
+      .filter((a) => a.textContent.includes(kw))
+      .map((a) => a.href);
 
-        if (links.length) {
-            let doc = await get_page(links[0]);
-            let pd_samples = [...doc.querySelectorAll("#log>tbody>tr")].map((tr) => [...tr.childNodes].map((td) => td.textContent.trim()));
-            let header = [...doc.querySelectorAll(".crf_preText")].map((a) =>
-                a.textContent.trim()
-            );
-            let content = [...doc.querySelectorAll(".crf_dataPoint")].map((a) =>
-                a.textContent.trim()
-            );
-            this.pdInfo[url] = {
-                header,
-                content,
-                pd_samples
-            };
-        }
-    };
+    if (links.length) {
+      let doc_ = await get_page(links[0]);
+      return [...doc_.querySelectorAll("#_ctl0_Content_R>table>tbody>tr")]
+        .map((tr) => [...tr.childNodes].map((td) => td.textContent.trim()))
+        .filter((i) => !i[0].startsWith("Printable"));
+    } else {
+      return [];
+    }
+  };
 
-    parse_1st_drug = async () => {
-        let url_prefix = location.href.split("/SubjectPage.aspx")[0];
-        let el = this.doc.querySelector(
-            "#_ctl0_LeftNav_EDCTaskList_TblTaskItems tr:nth-child(3)>td:nth-child(2)>a"
-        );
-        let link = new URL(el.href);
-        link = `${url_prefix}/InstancePage.aspx${link.search}`;
-        let res = await fetch(link).then((res) => res.text());
-        let doc = new DOMParser().parseFromString(res, "text/html");
-        let trs = doc.querySelectorAll(
-            "#_ctl0_LeftNav_EDCTaskList_TblTaskItems>tbody>tr"
-        );
-        let a = trs[trs.length - 1].querySelector("td:nth-child(2)>a");
+  parse_vst_PD = async (doc, url) => {
+    let links = [
+      ...doc.querySelectorAll(
+        "#_ctl0_LeftNav_EDCTaskList_TblTaskItems a.leftNaveTableRowLink"
+      ),
+    ]
+      .filter((a) => a.textContent.includes("Pharmacodynamic"))
+      .map((a) => a.href);
 
-        let link_;
-        if (a.text.trim() == "第1周期服药记录") {
-            link_ = new URL(a.href);
-            link_ = `${url_prefix}/InstancePage.aspx${link_.search}`;
-        }
+    if (links.length) {
+      this.pdInfo[url] = await Promise.all(
+        links.map(async (link) => await this._parse_vst_PD(link))
+      );
+    }
+  };
 
-        if (link_) {
-            let res = await fetch(link_).then((res) => res.text());
-            let doc = new DOMParser().parseFromString(res, "text/html");
-            this.fstDrug = doc
-                .querySelector("#log tr:nth-child(2)>td:nth-child(2)>a")
-                .text.trim();
-        }
-    };
+  _parse_vst_PD= async link=>{
+      let doc_ = await get_page(link);
+      let pd_samples = [...doc_.querySelectorAll("#log>tbody>tr")].map((tr) =>
+        [...tr.childNodes].map((td) => td.textContent.trim())
+      );
+      let header = [...doc_.querySelectorAll(".crf_preText")].map((a) =>
+        a.textContent.trim()
+      );
+      let content = [...doc_.querySelectorAll(".crf_dataPoint")].map((a) =>
+        a.textContent.trim()
+      );
+      return { header, content, pd_samples };
+  }
+
+  parse_1st_drug = async () => {
+    let url_prefix = location.href.split("/SubjectPage.aspx")[0];
+    let el = this.doc.querySelector(
+      "#_ctl0_LeftNav_EDCTaskList_TblTaskItems tr:nth-child(3)>td:nth-child(2)>a"
+    );
+    let link = new URL(el.href);
+    link = `${url_prefix}/InstancePage.aspx${link.search}`;
+    let res = await fetch(link).then((res) => res.text());
+    let doc = new DOMParser().parseFromString(res, "text/html");
+    let trs = doc.querySelectorAll(
+      "#_ctl0_LeftNav_EDCTaskList_TblTaskItems>tbody>tr"
+    );
+    let a = trs[trs.length - 1].querySelector("td:nth-child(2)>a");
+
+    let link_;
+    if (a.text.trim() == "第1周期服药记录") {
+      link_ = new URL(a.href);
+      link_ = `${url_prefix}/InstancePage.aspx${link_.search}`;
+    }
+
+    if (link_) {
+      let res = await fetch(link_).then((res) => res.text());
+      let doc = new DOMParser().parseFromString(res, "text/html");
+      this.fstDrug = doc
+        .querySelector("#log tr:nth-child(2)>td:nth-child(2)>a")
+        .text.trim();
+    }
+  };
 }
 
 
