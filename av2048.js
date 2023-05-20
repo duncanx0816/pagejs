@@ -4,7 +4,7 @@
 // @version      0.1
 // @description  try to take over the world!
 // @author       You
-// @match        http*://bbs6.fc1y.xyz/2048/*
+// @match        http*://data.3lv2g.com/2048/*
 // @match        http*://dp227.xyz/pw/*
 // @match        http*://down.dataaps.com/list.php?name=*
 // @match        http*://ww1.k00ppc.com/*
@@ -101,9 +101,6 @@ const juejin = () => {
             })
             flag = false
             console.log('done')
-            // window.getEventListeners(btn).click.forEach((item) => {
-            //     btn.removeEventListener('click', item.listener)
-            // })  // getEventListeners is only available in console
         }
     }, 100)
 }
@@ -148,6 +145,60 @@ const rargb_to=()=>{
     }
 }
 
+class AV2048{
+    constructor(){
+        this.blockAD();
+        this.parse();
+    }
+
+    parse=()=>{
+        this.info = [...document.querySelectorAll("#ajaxtable td.tal a.subject")]
+            .map((a) => {
+              let link = a.href;
+              let flag = new URL(a.href).pathname.startsWith("/2048/state");
+              let title = a.textContent.trim();
+              let date = a.parentElement.nextElementSibling
+                .querySelector("div.f10.gray")
+                .textContent.trim();
+              return { title, date, link, flag };
+            })
+            .filter((i) => i.flag)
+    }
+
+    blockAD=()=>{
+        unsafeWindow.setpos = () => {};
+        jq("div.tac").remove();
+        jq(".tr3[align='middle']").remove();
+        jq(".apd>a").remove();
+        jq("#td_tpc font").remove();
+        jq(".tr1.r_one").remove();
+        jq("#td_3733").parent().remove();
+
+        let ntime = 100;
+        let timer = setInterval(() => {
+          --ntime;
+          if (ntime < 0) {
+            clearInterval(timer);
+          }
+          jq("#td_3733").parent().remove();
+        }, 100);
+
+        let a = jq('#read_tpc > a[href*="?name="]')[0];
+
+        if (a && a.href.match(/\?name=(\w{32})/)) {
+            let hash = a.href.match(/\?name=(\w{32})/)[1];
+            let link = `${new URL(a.href).origin}/down.php/${hash}.torrent`;
+            let a_ = jq("<a/>", { href: link, text: link })[0];
+            jq(a).replaceWith(a_);
+
+            let h = jq("#subject_tpc")[0];
+            let h_ = jq("<a/>", { href: link })[0];
+            h_.innerHTML = h.outerHTML;
+            jq(h).replaceWith(h_);
+        }
+    }
+}
+
 (function () {
     'use strict';
     console.log('av2048')
@@ -159,32 +210,6 @@ const rargb_to=()=>{
     } else if (location.host == 'rargb.to') {
         rargb_to()
     } else {
-        unsafeWindow.setpos = () => {}
-        jq("div.tac").remove()
-        jq(".tr3[align='middle']").remove()
-        jq(".apd>a").remove()
-        jq("#td_tpc font").remove()
-        jq(".tr1.r_one").remove()
-        jq("#td_3733").parent().remove()
-
-        let ntime = 100
-        let timer = setInterval(() => {
-            --ntime
-            if (ntime < 0) {
-                clearInterval(timer)
-            }
-            jq("#td_3733").parent().remove()
-        }, 100)
-
-        let a=jq('#read_tpc > a[href*="?name="]')[0]
-        let hash=a.href.match(/\?name=(\w{32})/)[1]
-        let link=`${new URL(a.href).origin}/down.php/${hash}.torrent`
-        let a_=jq('<a/>',{href:link,text:link})[0]
-        jq(a).replaceWith(a_)
-
-        let h=jq('#subject_tpc')[0]
-        let h_=jq('<a/>',{href:link})[0]
-        h_.innerHTML=h.outerHTML
-        jq(h).replaceWith(h_)
+        unsafeWindow.av=new AV2048();
     }
 })();
