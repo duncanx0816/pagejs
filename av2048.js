@@ -163,15 +163,17 @@ class AV2048{
               return { title, pub_date, link, flag };
             })
             .filter((i) => i.flag)
-        
+
+        console.log(this.info.length);
+
         let url="https://www.wdym9816.top:444/api/av2048/"
         fetch(url, {
             method: "POST",
             mode: 'cors',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(this.info)
-        }).then(res=>{console.log(res)})
-        
+        }).then(res=>console.log(res.ok))
+
     }
 
     blockAD=()=>{
@@ -219,6 +221,20 @@ class AV2048{
     } else if (location.host == 'rargb.to') {
         rargb_to()
     } else {
-        unsafeWindow.av=new AV2048();
+        new AV2048()
+        let observer = new MutationObserver(() => {
+            console.log(`changed: ${(new Date()).getTime()}`)
+            observer.disconnect();
+            new AV2048()
+            observer.observe(
+                document.querySelector('#ajaxtable>tbody:nth-child(2)'), {
+                    childList: true
+            })
+        });
+        observer.observe(
+            document.querySelector('#ajaxtable>tbody:nth-child(2)'), {
+                childList: true
+        })
+
     }
 })();
