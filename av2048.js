@@ -166,16 +166,31 @@ class AV2048 {
   run = async () => {
     let url_index = "https://data.3lv2g.com/2048/";
     if (location.href == url_index) {
-      let req1 = [...Array(10).keys()].map(async (idx) =>
-        this.parse(`${url_index}thread.php?fid-13-page-${idx + 1}.html`)
-      );
-      let req2 = [...Array(10).keys()].map(async (idx) =>
-        this.parse(`${url_index}thread.php?fid-14-page-${idx + 1}.html`)
-      );
-      let req3 = [...Array(10).keys()].map(async (idx) =>
-        this.parse(`${url_index}thread.php?fid-3-page-${idx + 1}.html`)
-      );
-      await Promise.all([...req1, ...req2, ...req3]).then(() => this.update());
+      await Promise.all(
+        [...Array(10).keys()].map(async (idx) =>
+          this.parse(`${url_index}thread.php?fid-13-page-${idx + 1}.html`)
+        )
+      ).then(() => this.update());
+      await Promise.all(
+        [...Array(10).keys()].map(async (idx) =>
+          this.parse(`${url_index}thread.php?fid-3-page-${idx + 1}.html`)
+        )
+      ).then(() => this.update());
+      await Promise.all(
+        [...Array(10).keys()].map(async (idx) =>
+          this.parse(`${url_index}thread.php?fid-4-page-${idx + 1}.html`)
+        )
+      ).then(() => this.update());
+      await Promise.all(
+        [...Array(10).keys()].map(async (idx) =>
+          this.parse(`${url_index}thread.php?fid-16-page-${idx + 1}.html`)
+        )
+      ).then(() => this.update());
+      await Promise.all(
+        [...Array(10).keys()].map(async (idx) =>
+          this.parse(`${url_index}thread.php?fid-18-page-${idx + 1}.html`)
+        )
+      ).then(() => this.update());
     }
   };
 
@@ -203,7 +218,7 @@ class AV2048 {
       mode: "cors",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(this.info),
-    }).then((res) => console.log(res.ok));
+    }).then((res) => {if(res.ok){this.info=[]}});
   };
 
   blockAD = () => {
