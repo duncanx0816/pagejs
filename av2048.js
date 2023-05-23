@@ -226,10 +226,13 @@ class AV2048{
             console.log(`changed: ${(new Date()).getTime()}`)
             observer.disconnect();
             new AV2048()
-            observer.observe(
-                document.querySelector('#ajaxtable>tbody:nth-child(2)'), {
-                    childList: true
-            })
+            setTimeout(()=>{
+                observer.observe(
+                    document.querySelector('#ajaxtable>tbody:nth-child(2)'), {
+                        childList: true
+                })
+            }, 2000)
+
         });
         observer.observe(
             document.querySelector('#ajaxtable>tbody:nth-child(2)'), {
