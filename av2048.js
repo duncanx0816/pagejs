@@ -157,12 +157,21 @@ class AV2048{
               let link = a.href;
               let flag = new URL(a.href).pathname.startsWith("/2048/state");
               let title = a.textContent.trim();
-              let date = a.parentElement.nextElementSibling
+              let pub_date = a.parentElement.nextElementSibling
                 .querySelector("div.f10.gray")
                 .textContent.trim();
-              return { title, date, link, flag };
+              return { title, pub_date, link, flag };
             })
             .filter((i) => i.flag)
+        
+        let url="https://www.wdym9816.top:444/api/av2048/"
+        fetch(url, {
+            method: "POST",
+            mode: 'cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(this.info)
+        }).then(res=>{console.log(res)})
+        
     }
 
     blockAD=()=>{
