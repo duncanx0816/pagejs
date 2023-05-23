@@ -193,7 +193,6 @@ class AV2048 {
       })
       .filter((i) => i.flag);
     this.info = [...this.info, ...avs];
-    console.log([this.info.length, url]);
   };
 
   update = () => {
