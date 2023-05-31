@@ -191,6 +191,7 @@ class AV2048 {
           this.parse(`${url_index}thread.php?fid-18-page-${idx + 1}.html`)
         )
       ).then(() => this.update());
+      alert('done');
     }
   };
 
@@ -212,7 +213,7 @@ class AV2048 {
 
   update = () => {
     console.log(this.info.length);
-    let url = "https://www.wdym9816.top:444/api/av2048/";
+    let url = "https://www.wdym9816.top:444/api/update/av2048/";
     return fetch(url, {
       method: "POST",
       mode: "cors",
