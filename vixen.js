@@ -23,7 +23,7 @@ class Vixen {
         this.buildId = this.info.buildId
         this.run()
     }
-    
+
   update = () => {
     console.log(this.info.length);
     let url = "https://www.wdym9816.top:444/api/update/vixen/";
@@ -34,7 +34,7 @@ class Vixen {
       body: JSON.stringify(this.info),
     }).then((res) => {if(res.ok){this.info=[]}});
   };
-    
+
     run = async ()=>{
         if(document.querySelector('div.VideosSidebar__Main-sc-11jbuek-1.AJrQs')) document.querySelector('div.VideosSidebar__Main-sc-11jbuek-1.AJrQs').style.display='none';
         let divs=document.querySelectorAll('.Grid__GridContainer-f0cb34-0.bUAzPt.VideoList__VideoListContainer-sc-1u75cgc-0.eliAOo.videos__StyledVideoList-sc-1u2b7uh-3.dTsEcV>div.Grid__Item-f0cb34-1.dSIsBc')
@@ -42,13 +42,16 @@ class Vixen {
         let nVideo=Object.keys(this.videos).length
         localStorage.setItem('videos', JSON.stringify(this.videos))
 
-        let blob = new Blob([JSON.stringify(this.videos)], {
+        await this.update();
+
+        let blob = new Blob([JSON.stringify(this.info)], {
             type: "application/json"
         });
         let a = document.createElement('a')
         a.download = `${this.studio}.${(new Date()).getTime()}.${nVideo}.json`
         a.href = URL.createObjectURL(blob)
         a.click()
+        
         console.log(`done: ${nVideo}`)
         // confirm(`done: ${nVideo}`)
     }
