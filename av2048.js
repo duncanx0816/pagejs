@@ -166,32 +166,33 @@ class AV2048 {
   run = async () => {
     let url_index = "https://data.3lv2g.com/2048/";
     if (location.href == url_index) {
-      await Promise.all(
+      let a= Promise.all(
         [...Array(10).keys()].map(async (idx) =>
           this.parse(`${url_index}thread.php?fid-13-page-${idx + 1}.html`)
         )
       ).then(() => this.update());
-      await Promise.all(
+      let b= Promise.all(
         [...Array(10).keys()].map(async (idx) =>
           this.parse(`${url_index}thread.php?fid-3-page-${idx + 1}.html`)
         )
       ).then(() => this.update());
-      await Promise.all(
+      let c= Promise.all(
         [...Array(10).keys()].map(async (idx) =>
           this.parse(`${url_index}thread.php?fid-4-page-${idx + 1}.html`)
         )
       ).then(() => this.update());
-      await Promise.all(
+      let d= Promise.all(
         [...Array(10).keys()].map(async (idx) =>
           this.parse(`${url_index}thread.php?fid-16-page-${idx + 1}.html`)
         )
       ).then(() => this.update());
-      await Promise.all(
+      let e= Promise.all(
         [...Array(10).keys()].map(async (idx) =>
           this.parse(`${url_index}thread.php?fid-18-page-${idx + 1}.html`)
         )
       ).then(() => this.update());
-      alert('done');
+      
+      Promise.all([a,b,c,d,e]).then(()=>{alert('done')});
     }
   };
 
