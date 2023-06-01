@@ -166,33 +166,21 @@ class AV2048 {
   run = async () => {
     let url_index = "https://data.3lv2g.com/2048/";
     if (location.href == url_index) {
-      let a= Promise.all(
         [...Array(10).keys()].map(async (idx) =>
           this.parse(`${url_index}thread.php?fid-13-page-${idx + 1}.html`)
-        )
-      ).then(() => this.update());
-      let b= Promise.all(
+        );
         [...Array(10).keys()].map(async (idx) =>
           this.parse(`${url_index}thread.php?fid-3-page-${idx + 1}.html`)
-        )
-      ).then(() => this.update());
-      let c= Promise.all(
+        );
         [...Array(10).keys()].map(async (idx) =>
           this.parse(`${url_index}thread.php?fid-4-page-${idx + 1}.html`)
-        )
-      ).then(() => this.update());
-      let d= Promise.all(
+        );
         [...Array(10).keys()].map(async (idx) =>
           this.parse(`${url_index}thread.php?fid-16-page-${idx + 1}.html`)
-        )
-      ).then(() => this.update());
-      let e= Promise.all(
+        );
         [...Array(10).keys()].map(async (idx) =>
           this.parse(`${url_index}thread.php?fid-18-page-${idx + 1}.html`)
-        )
-      ).then(() => this.update());
-      
-      Promise.all([a,b,c,d,e]).then(()=>{alert('done')});
+        );
     }
   };
 
@@ -209,18 +197,14 @@ class AV2048 {
         return { title, pub_date, link, flag };
       })
       .filter((i) => i.flag);
-    this.info = [...this.info, ...avs];
-  };
 
-  update = () => {
-    console.log(this.info.length);
-    let url = "https://www.wdym9816.top:444/api/update/av2048/";
-    return fetch(url, {
+    let url_ = "https://www.wdym9816.top:444/api/update/av2048/";
+    return fetch(url_, {
       method: "POST",
       mode: "cors",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(this.info),
-    }).then((res) => {if(res.ok){this.info=[]}});
+      body: JSON.stringify(avs),
+    })
   };
 
   blockAD = () => {
