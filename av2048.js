@@ -165,7 +165,7 @@ class AV2048 {
 
   run = async () => {
     let url_index = "https://data.3lv2g.com/2048/";
-    if (location.href == url_index) {
+    if (location.href == url_index && document.querySelector('#cate_1')) {
         [...Array(10).keys()].map(async (idx) =>
           this.parse(`${url_index}thread.php?fid-13-page-${idx + 1}.html`)
         );
