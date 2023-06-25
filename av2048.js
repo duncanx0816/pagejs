@@ -5,6 +5,7 @@
 // @description  try to take over the world!
 // @author       You
 // @match        http*://data.3lv2g.com/2048/*
+// @match        http*://pbs.7t8mg.com/2048/*
 // @match        http*://dp227.xyz/pw/*
 // @match        http*://down.dataaps.com/list.php?name=*
 // @match        http*://ww1.k00ppc.com/*
@@ -164,7 +165,7 @@ class AV2048 {
   }
 
   run = async () => {
-    let url_index = "https://data.3lv2g.com/2048/";
+    let url_index = "https://pbs.7t8mg.com/2048/";
     if (location.href == url_index && document.querySelector('#cate_1')) {
         let a=[...Array(10).keys()].map(async (idx) =>
           this.parse(`${url_index}thread.php?fid-13-page-${idx + 1}.html`)
