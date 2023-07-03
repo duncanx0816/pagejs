@@ -5,7 +5,6 @@
 // @description  try to take over the world!
 // @author       You
 // @match        http*://data.3lv2g.com/2048/*
-// @match        http*://pbs.7t8mg.com/2048/*
 // @match        http*://dp227.xyz/pw/*
 // @match        http*://down.dataaps.com/list.php?name=*
 // @match        http*://ww1.k00ppc.com/*
@@ -131,6 +130,18 @@ const torlook = () => {
 };
 
 const rargb_to = () => {
+  unsafeWindow.rargb_click = () => {
+    event.preventDefault();
+    let blob = new Blob([event.target.attributes.data_link.value], {
+      type: "text/html",
+    });
+    let a = document.createElement("a");
+    a.download = `rargb.${new Date().getTime()}${location.search}.txt`;
+    a.href = URL.createObjectURL(blob);
+    a.click();
+    window.close();
+    return false;
+  };
   const parse_link = async (url) => {
     let res = await fetch(url).then((res) => res.text());
     let doc = new DOMParser().parseFromString(res, "text/html");
@@ -144,8 +155,11 @@ const rargb_to = () => {
   )) {
     parse_link(a.href).then((magnet) => {
       if (magnet) {
+        // a.parentElement.innerHTML =
+        //   `<a target="_blank" href="${magnet}" onclick="navigator.clipboard.writeText(event.target.href); return false">[Torrent]</a>  ` +
+        //   a.outerHTML;
         a.parentElement.innerHTML =
-          `<a target="_blank" href="${magnet}" onclick="navigator.clipboard.writeText(event.target.href); return false">[Torrent]</a>  ` +
+          `<a target="_blank" data_link="${magnet}" onclick=rargb_click();return false;>[Magnet]</a>  ` +
           a.outerHTML;
       }
     });
@@ -165,24 +179,27 @@ class AV2048 {
   }
 
   run = async () => {
-    let url_index = "https://pbs.7t8mg.com/2048/";
-    if (location.href == url_index && document.querySelector('#cate_1')) {
-        let a=[...Array(10).keys()].map(async (idx) =>
-          this.parse(`${url_index}thread.php?fid-13-page-${idx + 1}.html`)
-        );
-        let b=[...Array(10).keys()].map(async (idx) =>
-          this.parse(`${url_index}thread.php?fid-3-page-${idx + 1}.html`)
-        );
-        let c=[...Array(10).keys()].map(async (idx) =>
-          this.parse(`${url_index}thread.php?fid-4-page-${idx + 1}.html`)
-        );
-        let d=[...Array(10).keys()].map(async (idx) =>
-          this.parse(`${url_index}thread.php?fid-16-page-${idx + 1}.html`)
-        );
-        let e=[...Array(10).keys()].map(async (idx) =>
-          this.parse(`${url_index}thread.php?fid-18-page-${idx + 1}.html`)
-        );
-        Promise.all([...a,...b,...c,...d,...e]).then(()=>{alert('done');window.close()})
+    let url_index = "https://data.3lv2g.com/2048/";
+    if (location.href == url_index && document.querySelector("#cate_1")) {
+      let a = [...Array(10).keys()].map(async (idx) =>
+        this.parse(`${url_index}thread.php?fid-13-page-${idx + 1}.html`)
+      );
+      let b = [...Array(10).keys()].map(async (idx) =>
+        this.parse(`${url_index}thread.php?fid-3-page-${idx + 1}.html`)
+      );
+      let c = [...Array(10).keys()].map(async (idx) =>
+        this.parse(`${url_index}thread.php?fid-4-page-${idx + 1}.html`)
+      );
+      let d = [...Array(10).keys()].map(async (idx) =>
+        this.parse(`${url_index}thread.php?fid-16-page-${idx + 1}.html`)
+      );
+      let e = [...Array(10).keys()].map(async (idx) =>
+        this.parse(`${url_index}thread.php?fid-18-page-${idx + 1}.html`)
+      );
+      Promise.all([...a, ...b, ...c, ...d, ...e]).then(() => {
+        alert("done");
+        window.close();
+      });
     }
   };
 
@@ -206,7 +223,7 @@ class AV2048 {
       mode: "cors",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(avs),
-    })
+    });
   };
 
   blockAD = () => {
