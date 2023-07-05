@@ -11,6 +11,7 @@
 // @match        http*://juejin.cn/*
 // @match        http*://gw3.torlook.info/*
 // @match        https://rargb.to/*
+// @match        http://146.19.24.47:8000/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=fc1y.xyz
 // @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js
 // @updateURL    https://raw.githubusercontent.com/duncanx0816/pagejs/main/av2048.js
@@ -166,6 +167,26 @@ const rargb_to = () => {
   }
 };
 
+const yihuagong=()=>{
+    unsafeWindow.fn_click = () => {
+        event.preventDefault();
+        let blob = new Blob([event.target.attributes.data_link.value], {
+            type: "text/html",
+        });
+        let a = document.createElement("a");
+        a.download = `YHG.${new Date().getTime()}${location.search}.txt`;
+        a.href = URL.createObjectURL(blob);
+        a.click();
+        window.close();
+        return false;
+    };
+
+    [...document.querySelectorAll(".sbar a")].filter(a=>a.innerText=='[磁力链接]').forEach(a=>{
+        let magnet=a.href;
+        a.parentElement.innerHTML =`<a target="_blank" data_link="${magnet}" onclick=fn_click();return false;>[Magnet]</a>`
+    })
+}
+
 const get_page = async (url) => {
   let res = await fetch(url).then((res) => res.text());
   return new DOMParser().parseFromString(res, "text/html");
@@ -270,6 +291,8 @@ class AV2048 {
     torlook();
   } else if (location.host == "rargb.to") {
     rargb_to();
+  } else if (location.host == "146.19.24.47:8000") {
+    yihuagong();
   } else {
     new AV2048();
   }
