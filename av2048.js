@@ -103,7 +103,7 @@ const rargb_to = () => {
   [
     ...document.querySelectorAll(".lista2t tr.lista2 td.lista:nth-child(2)>a"),
   ].forEach(async (a) => {
-    let res = await fetch(url).then((res) => res.text());
+    let res = await fetch(a.href).then((res) => res.text());
     let doc = new DOMParser().parseFromString(res, "text/html");
     let aa = [...doc.querySelectorAll(".lista>a")].filter(
       (a_) => a_.href && a_.href.startsWith("magnet:")
