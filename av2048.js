@@ -10,7 +10,8 @@
 // @match        http*://ww1.k00ppc.com/*
 // @match        http*://juejin.cn/*
 // @match        http*://gw3.torlook.info/*
-// @match        https://rargb.to/*
+// @match        http*://rargb.to/*
+// @match        http*://1337x.to/*
 // @match        http://146.19.24.47:8000/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=fc1y.xyz
 // @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js
@@ -43,67 +44,73 @@
 const jq = $;
 unsafeWindow.jq = unsafeWindow.jq ? unsafeWindow.jq : jq;
 
-const init = () => {
-  unsafeWindow.GM_setValue = GM_setValue;
-  unsafeWindow.GM_getValue = GM_getValue;
-  unsafeWindow.GM_addStyle = GM_addStyle;
-  unsafeWindow.GM_deleteValue = GM_deleteValue;
-  unsafeWindow.GM_listValues = GM_listValues;
-  unsafeWindow.GM_addValueChangeListener = GM_addValueChangeListener;
-  unsafeWindow.GM_removeValueChangeListener = GM_removeValueChangeListener;
-  unsafeWindow.GM_log = GM_log;
-  unsafeWindow.GM_getResourceText = GM_getResourceText;
-  unsafeWindow.GM_getResourceURL = GM_getResourceURL;
-  unsafeWindow.GM_registerMenuCommand = GM_registerMenuCommand;
-  unsafeWindow.GM_unregisterMenuCommand = GM_unregisterMenuCommand;
-  unsafeWindow.GM_openInTab = GM_openInTab;
-  unsafeWindow.GM_xmlhttpRequest = GM_xmlhttpRequest;
-  unsafeWindow.GM_download = GM_download;
-  unsafeWindow.GM_getTab = GM_getTab;
-  unsafeWindow.GM_saveTab = GM_saveTab;
-  unsafeWindow.GM_getTabs = GM_getTabs;
-  unsafeWindow.GM_on = GM_notification;
-  unsafeWindow.GM_setClipboard = GM_setClipboard;
-  unsafeWindow.GM_info = GM_info;
+const get_page = async (url) => {
+  let res = await fetch(url).then((res) => res.text());
+  return new DOMParser().parseFromString(res, "text/html");
 };
 
-const juejin = () => {
-  let flag = true;
-  let ntime = 100;
-  let timer = setInterval(() => {
-    --ntime;
-    if (ntime < 0) {
-      clearInterval(timer);
-    }
-    jq(".wrap.category-course-recommend").remove();
-    jq(".sidebar-block.author-block.pure").remove();
-    jq(".recommend-box").remove();
-    jq(".article-end").remove();
-    jq(".sidebar-bd-entry").remove();
-    jq(".sidebar-block.app-download-sidebar-block.shadow").remove();
-    jq(".sidebar-block.shadow").remove();
-    jq(".main-nav-list").remove();
-    jq(".sidebar-block.sticky-block").remove();
-    jq(".sidebar-block.banner-block").remove();
-    jq("div.guide-collect-popover").hide();
-    jq("div.author-info-block").next("img").hide();
-    jq("#comment-box > div.comment-list-wrapper").hide();
-    jq("#comment-box > div.container.hot-list").hide();
+const yihuagong = () => {
+  unsafeWindow.fn_click = () => {
+    event.preventDefault();
+    let a = document.createElement("a");
+    a.download = `YHG.${new Date().getTime()}${location.search}.txt`;
+    a.href = URL.createObjectURL(
+      new Blob([event.target.href], { type: "text/html" })
+    );
+    a.click();
+    window.close();
+    return false;
+  };
+  [...document.querySelectorAll(".sbar a")]
+    .filter((a) => a.innerText == "[磁力链接]")
+    .forEach((a) => (a.onclick = fn_click));
+};
 
-    let btn_old = jq("button.btn.meiqia-btn");
-    if (flag && btn_old.length) {
-      let btn_new = btn_old.clone();
-      btn_old.replaceWith(btn_new); // remove all listeners on btn_old
-      btn_new.click((e) => {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        jq("#comment-box > div.comment-list-wrapper").toggle();
-        jq("#comment-box > div.container.hot-list").toggle();
-      });
-      flag = false;
-      console.log("done");
+const fn_1337x = () => {
+  unsafeWindow.fn_click = () => {
+    event.preventDefault();
+    let a = document.createElement("a");
+    a.download = `1337x.${new Date().getTime()}${location.search}.txt`;
+    a.href = URL.createObjectURL(
+      new Blob([event.target.dataset.link], { type: "text/html" })
+    );
+    a.click();
+    window.close();
+    return false;
+  };
+  [...document.querySelectorAll('td.coll-1.name a[href*="/torrent"]')].forEach(
+    async (a) => {
+      let res = await fetch(a.href).then((res) => res.text());
+      let doc = new DOMParser().parseFromString(res, "text/html");
+      a.dataset.link = doc.querySelector(".torrent-detail-page ul a").href;
+      a.onclick = fn_click;
     }
-  }, 100);
+  );
+};
+
+const rargb_to = () => {
+  unsafeWindow.fn_click = () => {
+    event.preventDefault();
+    let a = document.createElement("a");
+    a.download = `rargb.${new Date().getTime()}${location.search}.txt`;
+    a.href = URL.createObjectURL(
+      new Blob([event.target.dataset.link], { type: "text/html" })
+    );
+    a.click();
+    window.close();
+    return false;
+  };
+  [
+    ...document.querySelectorAll(".lista2t tr.lista2 td.lista:nth-child(2)>a"),
+  ].forEach(async (a) => {
+    let res = await fetch(url).then((res) => res.text());
+    let doc = new DOMParser().parseFromString(res, "text/html");
+    let aa = [...doc.querySelectorAll(".lista>a")].filter(
+      (a_) => a_.href && a_.href.startsWith("magnet:")
+    );
+    a.dataset.link = aa.length ? aa[0].href : "";
+    a.onclick = fn_click;
+  });
 };
 
 const torlook = () => {
@@ -128,68 +135,6 @@ const torlook = () => {
         console.log(`magnet:${data.split("magnet:")[1].split("'")[0]}`);
       });
   });
-};
-
-const rargb_to = () => {
-  unsafeWindow.rargb_click = () => {
-    event.preventDefault();
-    let blob = new Blob([event.target.attributes.data_link.value], {
-      type: "text/html",
-    });
-    let a = document.createElement("a");
-    a.download = `rargb.${new Date().getTime()}${location.search}.txt`;
-    a.href = URL.createObjectURL(blob);
-    a.click();
-    window.close();
-    return false;
-  };
-  const parse_link = async (url) => {
-    let res = await fetch(url).then((res) => res.text());
-    let doc = new DOMParser().parseFromString(res, "text/html");
-    for (let a of doc.querySelectorAll(".lista>a")) {
-      if (a.href && a.href.startsWith("magnet:")) return a.href;
-    }
-  };
-
-  for (let a of document.querySelectorAll(
-    ".lista2t tr.lista2 td.lista:nth-child(2)>a"
-  )) {
-    parse_link(a.href).then((magnet) => {
-      if (magnet) {
-        // a.parentElement.innerHTML =
-        //   `<a target="_blank" href="${magnet}" onclick="navigator.clipboard.writeText(event.target.href); return false">[Torrent]</a>  ` +
-        //   a.outerHTML;
-        a.parentElement.innerHTML =
-          `<a target="_blank" data_link="${magnet}" onclick=rargb_click();return false;>[Magnet]</a>  ` +
-          a.outerHTML;
-      }
-    });
-  }
-};
-
-const yihuagong=()=>{
-    unsafeWindow.fn_click = () => {
-        event.preventDefault();
-        let blob = new Blob([event.target.attributes.data_link.value], {
-            type: "text/html",
-        });
-        let a = document.createElement("a");
-        a.download = `YHG.${new Date().getTime()}${location.search}.txt`;
-        a.href = URL.createObjectURL(blob);
-        a.click();
-        window.close();
-        return false;
-    };
-
-    [...document.querySelectorAll(".sbar a")].filter(a=>a.innerText=='[磁力链接]').forEach(a=>{
-        let magnet=a.href;
-        a.parentElement.innerHTML =`<a target="_blank" data_link="${magnet}" onclick=fn_click();return false;>[Magnet]</a>`
-    })
-}
-
-const get_page = async (url) => {
-  let res = await fetch(url).then((res) => res.text());
-  return new DOMParser().parseFromString(res, "text/html");
 };
 
 class AV2048 {
@@ -281,6 +226,45 @@ class AV2048 {
   };
 }
 
+const juejin = () => {
+  let flag = true;
+  let ntime = 100;
+  let timer = setInterval(() => {
+    --ntime;
+    if (ntime < 0) {
+      clearInterval(timer);
+    }
+    jq(".wrap.category-course-recommend").remove();
+    jq(".sidebar-block.author-block.pure").remove();
+    jq(".recommend-box").remove();
+    jq(".article-end").remove();
+    jq(".sidebar-bd-entry").remove();
+    jq(".sidebar-block.app-download-sidebar-block.shadow").remove();
+    jq(".sidebar-block.shadow").remove();
+    jq(".main-nav-list").remove();
+    jq(".sidebar-block.sticky-block").remove();
+    jq(".sidebar-block.banner-block").remove();
+    jq("div.guide-collect-popover").hide();
+    jq("div.author-info-block").next("img").hide();
+    jq("#comment-box > div.comment-list-wrapper").hide();
+    jq("#comment-box > div.container.hot-list").hide();
+
+    let btn_old = jq("button.btn.meiqia-btn");
+    if (flag && btn_old.length) {
+      let btn_new = btn_old.clone();
+      btn_old.replaceWith(btn_new); // remove all listeners on btn_old
+      btn_new.click((e) => {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        jq("#comment-box > div.comment-list-wrapper").toggle();
+        jq("#comment-box > div.container.hot-list").toggle();
+      });
+      flag = false;
+      console.log("done");
+    }
+  }, 100);
+};
+
 (function () {
   "use strict";
   console.log("av2048");
@@ -293,6 +277,8 @@ class AV2048 {
     rargb_to();
   } else if (location.host == "146.19.24.47:8000") {
     yihuagong();
+  } else if (location.host == "1337x.to") {
+    fn_1337x();
   } else {
     new AV2048();
   }
