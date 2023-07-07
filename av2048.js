@@ -16,7 +16,7 @@
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=fc1y.xyz
 // @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js
 // @updateURL    https://raw.githubusercontent.com/duncanx0816/pagejs/main/av2048.js
-// @grant        unsafeWndiow
+// @grant        unsafeWindow
 // @grant        window.close
 // @grant        GM_addStyle
 // @grant        GM_deleteValue
