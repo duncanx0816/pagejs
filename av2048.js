@@ -94,7 +94,7 @@ const rargb_to = () => {
     let a = document.createElement("a");
     a.download = `rargb.${new Date().getTime()}${location.search}.txt`;
     a.href = URL.createObjectURL(
-      new Blob([event.target.dataset.link], { type: "text/html" })
+      new Blob([event.target.dataset.link+'\n'], { type: "text/html" })
     );
     a.click();
     window.close();
