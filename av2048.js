@@ -60,6 +60,7 @@ const hegre = () => {
   }
     
   setInterval(()=>{
+      console.log('hegre');
       [...document.querySelectorAll(".item img")].forEach(item=>{
           item.onclick=fn_click;
       });
@@ -289,8 +290,8 @@ const juejin = () => {
   if (location.host == "juejin.cn") {
     juejin();
   } else if (location.host == "www.hegre.com") {
-    hegre();  } 
-  else if (location.host == "gw3.torlook.info") {
+    hegre();  
+  } else if (location.host == "gw3.torlook.info") {
     torlook();
   } else if (location.host == "rargb.to") {
     rargb_to();
