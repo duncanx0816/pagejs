@@ -60,7 +60,7 @@ const hegre = () => {
   }
     
   setInterval(()=>{
-      alter('hegre');
+      console.log('hegre');
       [...document.querySelectorAll(".item img")].forEach(item=>{
           item.onclick=fn_click;
       });
