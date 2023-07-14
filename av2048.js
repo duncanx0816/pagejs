@@ -59,9 +59,11 @@ const hegre = () => {
       return false;
   }
     
-  [...document.querySelectorAll(".item img")].forEach(item=>{
-      item.onclick=fn_click;
-  });
+  setInterval(()=>{
+      [...document.querySelectorAll(".item img")].forEach(item=>{
+          item.onclick=fn_click;
+      });
+  }, 60000)
 }
 
 const yihuagong = () => {
