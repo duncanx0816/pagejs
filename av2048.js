@@ -12,6 +12,7 @@
 // @match        http*://gw3.torlook.info/*
 // @match        http*://rargb.to/*
 // @match        http*://1337x.to/*
+// @match        https://www.hegre.com/movies
 // @match        http://146.19.24.47:8000/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=fc1y.xyz
 // @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js
@@ -48,6 +49,20 @@ const get_page = async (url) => {
   let res = await fetch(url).then((res) => res.text());
   return new DOMParser().parseFromString(res, "text/html");
 };
+
+const hegre = () => {
+  unsafeWindow.fn_click=()=>{
+      event.preventDefault();
+      event.stopPropagation();
+      let link=`https://www.google.com/search?q=${event.target.closest('a').href.split('/').pop()}+porn`
+      window.open(link);
+      return false;
+  }
+    
+  [...document.querySelectorAll(".item img")].forEach(item=>{
+      item.onclick=fn_click;
+  });
+}
 
 const yihuagong = () => {
   unsafeWindow.fn_click = () => {
@@ -271,7 +286,9 @@ const juejin = () => {
 
   if (location.host == "juejin.cn") {
     juejin();
-  } else if (location.host == "gw3.torlook.info") {
+  } else if (location.host == "www.hegre.com") {
+    hegre();  } 
+  else if (location.host == "gw3.torlook.info") {
     torlook();
   } else if (location.host == "rargb.to") {
     rargb_to();
