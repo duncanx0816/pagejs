@@ -54,7 +54,7 @@ const hegre = () => {
   unsafeWindow.fn_click=()=>{
       event.preventDefault();
       event.stopPropagation();
-      let link=`https://www.google.com/search?q=${event.target.closest('a').href.split('/').pop()}+porn`
+      let link=`https://www.google.com/search?q=${event.target.closest('a').href.split('/').pop()}+porntrex`
       window.open(link);
       return false;
   }
