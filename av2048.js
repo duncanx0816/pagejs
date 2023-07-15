@@ -67,7 +67,11 @@ const hegre = () => {
   }
 
   main(); 
-  setInterval(main, 60000)
+  let observer = new MutationObserver(main);
+  observer.observe(
+      document.querySelector("#films-listing"), {
+      childList: true,
+  });
 }
 
 const yihuagong = () => {
