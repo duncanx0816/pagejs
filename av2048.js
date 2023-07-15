@@ -297,6 +297,7 @@ const juejin = () => {
   if (location.host == "juejin.cn") {
     juejin();
   } else if (location.host == "www.hegre.com") {
+    console.log('hegre');
     hegre();  
   } else if (location.host == "gw3.torlook.info") {
     torlook();
