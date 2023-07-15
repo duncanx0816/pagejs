@@ -58,13 +58,16 @@ const hegre = () => {
       window.open(link);
       return false;
   }
-    
-  setInterval(()=>{
-      console.log('hegre');
-      [...document.querySelectorAll(".item img")].forEach(item=>{
-          item.onclick=fn_click;
-      });
-  }, 60000)
+
+  const main=()=>{
+    console.log('hegre');
+    [...document.querySelectorAll(".item img")].forEach(item=>{
+      item.onclick=fn_click;
+    });
+  }
+
+  main(); 
+  setInterval(main, 60000)
 }
 
 const yihuagong = () => {
