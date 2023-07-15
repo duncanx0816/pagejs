@@ -67,7 +67,9 @@ const hegre = () => {
   }
 
   main(); 
-  let observer = new MutationObserver(main);
+  let observer = new MutationObserver(() => {
+      setTimeout(main, 1000)
+  });
   observer.observe(
       document.querySelector("#films-listing"), {
       childList: true,
