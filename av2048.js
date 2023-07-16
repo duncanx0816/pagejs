@@ -12,7 +12,7 @@
 // @match        http*://gw3.torlook.info/*
 // @match        http*://rargb.to/*
 // @match        http*://1337x.to/*
-// @match        https://www.hegre.com/movies*
+// @match        https://www.hegre.com/*
 // @match        http://146.19.24.47:8000/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=fc1y.xyz
 // @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js
