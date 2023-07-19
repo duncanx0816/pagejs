@@ -124,6 +124,7 @@ const rargb_to = () => {
       new Blob([event.target.dataset.link+'\n'], { type: "text/html" })
     );
     a.click();
+    event.target.style.color="gray";
     window.close();
     return false;
   };
