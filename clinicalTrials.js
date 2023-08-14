@@ -94,6 +94,8 @@ function scmp(){
         document.querySelectorAll('.generic-article__body.article-details-type--div.content--div.image-inline-container').forEach(e=>e.remove())
         document.querySelectorAll('.opinion-article__body.article-details-type--div.content--div.methode-html-wrapper.oembed-wrapper').forEach(e=>e.remove())
         document.querySelectorAll('.opinion-article__body.article-details-type--newsletter.content--newsletter').forEach(e=>e.remove())
+        document.querySelectorAll('[data-qa*=VideoContainer]').forEach(e=>e.remove())
+        document.querySelectorAll('[data-qa*=AdSlot-Container]').forEach(e=>e.remove())
     }, 1000);
 }
 
