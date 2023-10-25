@@ -16,6 +16,13 @@
 // @grant        GM_openInTab
 // ==/UserScript==
 
+
+const get_page = async (url) => {
+    let res = await fetch(url).then((res) => res.text());
+    return new DOMParser().parseFromString(res, "text/html");
+};
+
+
 class Vixen {
   constructor() {
     this.studio = location.host.split(".")[1];
@@ -47,10 +54,11 @@ class Vixen {
       document.querySelector(
         "div.VideosSidebar__Main-sc-11jbuek-1.AJrQs"
       ).style.display = "none";
-    let divs = document.querySelectorAll(
-      ".Grid__GridContainer-f0cb34-0.bUAzPt.VideoList__VideoListContainer-sc-1u75cgc-0.eliAOo.videos__StyledVideoList-sc-1u2b7uh-3.dTsEcV>div.Grid__Item-f0cb34-1.dSIsBc"
-    );
-    await Promise.all(Array.from(divs).map(this.parseVideo));
+    // let divs = document.querySelectorAll(
+    //   ".Grid__GridContainer-f0cb34-0.bUAzPt.VideoList__VideoListContainer-sc-1u75cgc-0.eliAOo.videos__StyledVideoList-sc-1u2b7uh-3.dTsEcV>div.Grid__Item-f0cb34-1.dSIsBc"
+    // );
+    // await Promise.all(Array.from(divs).map(this.parseVideo));
+    await Promise.all(this.info.props.pageProps.edges.map(this.parseVideo));
     let nVideo = Object.keys(this.videos).length;
     localStorage.setItem("videos", JSON.stringify(this.videos));
 
@@ -68,7 +76,21 @@ class Vixen {
     // confirm(`done: ${nVideo}`)
   };
 
-  parseVideo = async (elm) => {
+  parseVideo=async (elm)=>{
+      let slug=elm.node.slug
+      let doc=get_page(`/videos/${slug}`)
+      let img_url=new URL(document.querySelector('picture>source').srcset.split(' ')[0])
+      img_url.pathname=img_url.pathname.split('_')[0]+'_3840x2160.jpeg'
+  
+      if (!(slug in this.videos)){
+          setTimeout(() => {
+              GM_openInTab(img_url.href)
+          }, parseInt(Math.random() * 1000));
+      }
+      this.videos[slug] = img_url
+  }
+  
+  parseVideo2 = async (elm) => {
     let slug = elm
       .querySelector(
         ".VideoThumbnailPreview__VideoThumbnailLink-sc-1l0c3o7-8.cuAzUN"
