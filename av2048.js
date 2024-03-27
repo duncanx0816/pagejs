@@ -11,9 +11,9 @@
 // @match        http*://juejin.cn/*
 // @match        http*://gw3.torlook.info/*
 // @match        http*://rargb.to/*
+// @match        https://en.btdig.com/*
 // @match        http*://1337x.to/*
 // @match        https://www.hegre.com/*
-// @match        https://www.delphinefilms.com/*
 // @match        http://146.19.24.47:8000/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=fc1y.xyz
 // @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js
@@ -52,47 +52,30 @@ const get_page = async (url) => {
 };
 
 const hegre = () => {
-  unsafeWindow.fn_click = () => {
-    event.preventDefault();
-    event.stopPropagation();
-    let link = `https://www.google.com/search?q=${event.target
-      .closest("a")
-      .href.split("/")
-      .pop()}+porntrex`;
-    window.open(link);
-    return false;
-  };
+  unsafeWindow.fn_click=()=>{
+      event.preventDefault();
+      event.stopPropagation();
+      let link=`https://www.google.com/search?q=${event.target.closest('a').href.split('/').pop()}+porntrex`
+      window.open(link);
+      return false;
+  }
 
-  const main = () => {
-    console.log("hegre");
-    [...document.querySelectorAll(".item img")].forEach((item) => {
-      item.onclick = fn_click;
+  const main=()=>{
+    console.log('hegre');
+    [...document.querySelectorAll(".item img")].forEach(item=>{
+      item.onclick=fn_click;
     });
-  };
+  }
 
   main();
   let observer = new MutationObserver(() => {
-    setTimeout(main, 1000);
+      setTimeout(main, 1000)
   });
-  observer.observe(document.querySelector("#films-listing"), {
-    childList: true,
+  observer.observe(
+      document.querySelector("#films-listing"), {
+      childList: true,
   });
-};
-
-const delphine = () => {
-    console.log("delphine");
-    [...document.querySelectorAll(".watch-now-join-us")].forEach((e) =>
-      e.remove()
-    );
-    [...document.querySelectorAll(".mus-reveal-video-widget img")].forEach(
-      (item) => {
-        let title = item.alt.replace(" ", "+");
-        let a = item.closest("a");
-        a.target = "_blank";
-        a.href = `https://www.google.com/search?q=${title}+spankbang+delphine`;
-      }
-    );
-};
+}
 
 const yihuagong = () => {
   unsafeWindow.fn_click = () => {
@@ -139,11 +122,10 @@ const rargb_to = () => {
     let a = document.createElement("a");
     a.download = `rargb.${new Date().getTime()}${location.search}.txt`;
     a.href = URL.createObjectURL(
-      new Blob([event.target.dataset.link + "\n"], { type: "text/html" })
+      new Blob([event.target.dataset.link+'\n'], { type: "text/html" })
     );
     a.click();
-    //window.close();
-    event.target.style.color = "gray";
+    window.close();
     return false;
   };
   [
@@ -155,6 +137,25 @@ const rargb_to = () => {
       (a_) => a_.href && a_.href.startsWith("magnet:")
     );
     a.dataset.link = aa.length ? aa[0].href : "";
+    a.onclick = fn_click;
+  });
+};
+
+const btdig = () => {
+  unsafeWindow.fn_click = () => {
+    event.preventDefault();
+    let a = document.createElement("a");
+    a.download = `btdig.${new Date().getTime()}${location.search}.txt`;
+    a.href = URL.createObjectURL(
+      new Blob([event.target.href+'\n'], { type: "text/html" })
+    );
+    a.click();
+    // window.close();
+    return false;
+  };
+  [
+    ...document.querySelectorAll(".torrent_magnet a"),
+  ].forEach(async (a) => {
     a.onclick = fn_click;
   });
 };
@@ -193,7 +194,7 @@ class AV2048 {
   run = async () => {
     let url_index = "https://data.3lv2g.com/2048/";
     if (location.href == url_index && document.querySelector("#cate_1")) {
-      let a = [...Array(10).keys()].map(async (idx) =>
+      let a = [...Array(20).keys()].map(async (idx) =>
         this.parse(`${url_index}thread.php?fid-13-page-${idx + 1}.html`)
       );
       let b = [...Array(10).keys()].map(async (idx) =>
@@ -318,15 +319,14 @@ const juejin = () => {
   if (location.host == "juejin.cn") {
     juejin();
   } else if (location.host == "www.hegre.com") {
-    console.log("hegre");
+    console.log('hegre');
     hegre();
-  } else if (location.host == "www.delphinefilms.com") {
-    console.log("delphine");
-    delphine();
   } else if (location.host == "gw3.torlook.info") {
     torlook();
   } else if (location.host == "rargb.to") {
     rargb_to();
+  } else if (location.host == "en.btdig.com") {
+    btdig();
   } else if (location.host == "146.19.24.47:8000") {
     yihuagong();
   } else if (location.host == "1337x.to") {
