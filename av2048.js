@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         av2048
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      20240328
 // @description  try to take over the world!
 // @author       You
 // @match        http*://data.3lv2g.com/2048/*
@@ -14,6 +14,7 @@
 // @match        https://en.btdig.com/*
 // @match        http*://1337x.to/*
 // @match        https://www.hegre.com/*
+// @match        https://www.delphinefilms.com/*
 // @match        http://146.19.24.47:8000/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=fc1y.xyz
 // @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js
@@ -76,6 +77,21 @@ const hegre = () => {
       childList: true,
   });
 }
+
+const delphine = () => {
+    console.log("delphine");
+    [...document.querySelectorAll(".watch-now-join-us")].forEach((e) =>
+      e.remove()
+    );
+    [...document.querySelectorAll(".mus-reveal-video-widget img")].forEach(
+      (item) => {
+        let title = item.alt.replace(" ", "+");
+        let a = item.closest("a");
+        a.target = "_blank";
+        a.href = `https://www.google.com/search?q=${title}+spankbang+delphine`;
+      }
+    );
+};
 
 const yihuagong = () => {
   unsafeWindow.fn_click = () => {
@@ -321,6 +337,9 @@ const juejin = () => {
   } else if (location.host == "www.hegre.com") {
     console.log('hegre');
     hegre();
+  } else if (location.host == "www.delphinefilms.com") {
+    console.log("delphine");
+    delphine();
   } else if (location.host == "gw3.torlook.info") {
     torlook();
   } else if (location.host == "rargb.to") {
