@@ -210,21 +210,21 @@ class AV2048 {
 
   run = async () => {
     let url_index = "https://data.3lv2g.com/2048/";
-    if (location.href == url_index && document.querySelector("#cate_1")) {
+    if (location.href == url_index) {
       let a = [...Array(20).keys()].map(async (idx) =>
-        this.parse(`${url_index}thread.php?fid-13-page-${idx + 1}.html`)
+        this.parse(`${url_index}thread.php?fid=13&page=${idx + 1}`)
       );
       let b = [...Array(10).keys()].map(async (idx) =>
-        this.parse(`${url_index}thread.php?fid-3-page-${idx + 1}.html`)
+        this.parse(`${url_index}thread.php?fid=3&page=${idx + 1}`)
       );
       let c = [...Array(10).keys()].map(async (idx) =>
-        this.parse(`${url_index}thread.php?fid-4-page-${idx + 1}.html`)
+        this.parse(`${url_index}thread.php?fid=4&page=${idx + 1}`)
       );
       let d = [...Array(10).keys()].map(async (idx) =>
-        this.parse(`${url_index}thread.php?fid-16-page-${idx + 1}.html`)
+        this.parse(`${url_index}thread.php?fid=16&page=${idx + 1}`)
       );
       let e = [...Array(10).keys()].map(async (idx) =>
-        this.parse(`${url_index}thread.php?fid-18-page-${idx + 1}.html`)
+        this.parse(`${url_index}thread.php?fid=18&page=${idx + 1}`)
       );
       Promise.all([...a, ...b, ...c, ...d, ...e]).then(() => {
         alert("done");
@@ -244,8 +244,7 @@ class AV2048 {
           .querySelector("div.f10.gray")
           .textContent.trim();
         return { title, pub_date, link, flag };
-      })
-      .filter((i) => i.flag);
+      });
 
     let url_ = "https://www.wdym9816.top:444/api/update/av2048/";
     return fetch(url_, {
