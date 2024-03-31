@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         av2048
 // @namespace    http://tampermonkey.net/
-// @version      20240328
+// @version      2024-03-31
 // @description  try to take over the world!
 // @author       You
 // @match        http*://data.3lv2g.com/2048/*
@@ -19,6 +19,7 @@
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=fc1y.xyz
 // @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js
 // @updateURL    https://raw.githubusercontent.com/duncanx0816/pagejs/main/av2048.js
+// @downloadURL  https://raw.githubusercontent.com/duncanx0816/pagejs/main/av2048.js
 // @grant        unsafeWindow
 // @grant        window.close
 // @grant        GM_addStyle
