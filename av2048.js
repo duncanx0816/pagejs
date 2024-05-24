@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         av2048
 // @namespace    http://tampermonkey.net/
-// @version      2024-03-31
+// @version      2024-05-24
 // @description  try to take over the world!
 // @author       You
 // @match        http*://data.3lv2g.com/2048/*
+// @match        http*://data.down2048.com/*
 // @match        http*://dp227.xyz/pw/*
 // @match        http*://down.dataaps.com/list.php?name=*
 // @match        http*://ww1.k00ppc.com/*
@@ -47,6 +48,7 @@
 
 const jq = $;
 unsafeWindow.jq = unsafeWindow.jq ? unsafeWindow.jq : jq;
+unsafeWindow.setpos=function(){};
 
 const get_page = async (url) => {
   let res = await fetch(url).then((res) => res.text());
