@@ -6,7 +6,8 @@
 // @author       You
 // @match        http*://q0519.cc/pw/*
 // @match        http*://thza.cc/*
-// @match        http*://www.b23dowx.*/link.aspx?hash=*
+// @match        http*://z2311k.xyz/pw/*
+// @match        http*://*/link.aspx?hash=*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=q0519.cc
 // @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js
 // @grant        unsafeWindow
