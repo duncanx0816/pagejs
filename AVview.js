@@ -4,11 +4,9 @@
 // @version      2024-06-02
 // @description  try to take over the world!
 // @author       You
-// @match        http*://q0519.cc/pw/*
+// @match        http*://*/pw/*
 // @match        http*://thza.cc/*
 // @match        http://777630.xyz/*
-// @match        http*://z2311k.xyz/pw/*
-// @match        http*://z2311k.work/pw/*
 // @match        http*://g8b1.com/*
 // @match        http://www.99ybbc.com/*
 // @match        https://np2f.kum1.net/*
@@ -63,13 +61,15 @@ const parse = async (css) => {
             return { title, pub_date, link };
         });
 
-    let url_ = "https://www.wdym9816.top:444/api/update/av2048/";
-    return fetch(url_, {
-        method: "POST",
-        mode: "cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(avs),
-    });
+    if(avs.length){
+        let url_ = "https://www.wdym9816.top:444/api/update/av2048/";
+        return fetch(url_, {
+            method: "POST",
+            mode: "cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(avs),
+        });
+    }
 };
 
 (function() {
