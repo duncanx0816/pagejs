@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AVview
 // @namespace    http://tampermonkey.net/
-// @version      2024-06-01
+// @version      2024-06-02
 // @description  try to take over the world!
 // @author       You
 // @match        http*://q0519.cc/pw/*
@@ -10,6 +10,7 @@
 // @match        http*://z2311k.xyz/pw/*
 // @match        http*://g8b1.com/*
 // @match        http://www.99ybbc.com/*
+// @match        https://np2f.kum1.net/*
 // @match        http*://*/link.aspx?hash=*
 // @match        https://*/list.php?name=*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=q0519.cc
