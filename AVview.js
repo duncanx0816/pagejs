@@ -8,6 +8,7 @@
 // @match        http*://thza.cc/*
 // @match        http://777630.xyz/*
 // @match        http*://z2311k.xyz/pw/*
+// @match        http*://z2311k.work/pw/*
 // @match        http*://g8b1.com/*
 // @match        http://www.99ybbc.com/*
 // @match        https://np2f.kum1.net/*
