@@ -1,15 +1,17 @@
 // ==UserScript==
 // @name         AVview
 // @namespace    http://tampermonkey.net/
-// @version      2024-06-02
+// @version      2024-06-08
 // @description  try to take over the world!
 // @author       You
 // @match        http*://*/pw/*
 // @match        http*://thza.cc/*
 // @match        http://777630.xyz/*
+// @match        http://777631.xyz/*
 // @match        http*://g8b1.com/*
 // @match        http://www.99ybbc.com/*
 // @match        https://np2f.kum1.net/*
+// @match        https://www.sehuatang.net/*
 // @match        http*://*/link.aspx?hash=*
 // @match        https://*/list.php?name=*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=q0519.cc
@@ -95,7 +97,7 @@ const parse = async (css) => {
                     let div = document.createElement("div");
                     div.style.textAlign = "center";
                     div.style.maxWidth = "600px";
-                    div.innerHTML = `<a href="${a.href}"><img src="${src}" width="100%"></a>`;
+                    div.innerHTML = `<a target="_blank" href="${a.href}"><img src="${src}" width="100%"></a>`;
 
                     el.appendChild(div);
                 }
