@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         EDC
+// @name         EDC-CU01
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      20240725
 // @description  try to take over the world!
 // @author       You
 // @match        https://ascentage.mdsol.com/*
@@ -9,7 +9,7 @@
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=mdsol.com
 // @grant        GM_openInTab
 // @grant        window.close
-// @require      file://C:\Users\lckfb-xdk\Desktop\edc.js
+// @require2      file://C:\Users\lckfb-xdk\Desktop\edc.js
 // ==/UserScript==
 
 const get_page = async (url) => {
