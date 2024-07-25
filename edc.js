@@ -48,6 +48,8 @@ class Subject {
     this.cytogenetic = {};
     this.mutation = {};
     this.therapies = {};
+    this.diagnosis = {};
+    this.randomization = {};
 
     this.doc = doc;
     this.subID = this.doc
@@ -73,6 +75,9 @@ class Subject {
       this.vstInfo.map(async (vst) => this.parse_vst_detail(vst[2]))
     );
 
+    await this.parse_diagnosis();
+    await this.parse_randomization();
+
     // await this.parse_1st_drug();
     // await this.parse_eot();
 
@@ -89,6 +94,8 @@ class Subject {
           molecular: this.molecular,
           cytogenetic: this.cytogenetic,
           mutation: this.mutation,
+          diagnosis: this.diagnosis,
+          randomization: this.randomization,
         }),
       ],
       {
@@ -102,10 +109,29 @@ class Subject {
     window.close();
   };
 
+  parse_diagnosis = async () => {
+    let res = this.vstInfo.filter((item) => item[0] == "Screening");
+    if(res.length){
+      let doc = await get_page(res[0][2]);
+      this.diagnosis = await this._parse_vst_detail(doc, "CML History");
+    }
+  };
+
+  parse_randomization = async () => {
+    let res = this.vstInfo.filter((item) => item[0] == ".Cycle 1 Day 1");
+    if(res.length > 0) {
+      let url=res[0][2];
+      let doc = await get_page(url);
+      this.randomization = await this._parse_vst_detail(doc, "Randomization");
+    }
+  };
+
   parse_eot = async () => {
-    if (this.doc.querySelector('a.leftNaveTableRowLink[title^="治疗终止"]')) {
+    if (
+      this.doc.querySelector('a.leftNaveTableRowLink[title^="End of Study"]')
+    ) {
       let link = this.doc.querySelector(
-        'a.leftNaveTableRowLink[title^="治疗终止"]'
+        'a.leftNaveTableRowLink[title^="End of Study"]'
       ).href;
       let doc = await fetch(link)
         .then((res) => res.text())
@@ -220,19 +246,19 @@ class Subject {
     }
   };
 
-  _parse_vst_PD= async link=>{
-      let doc_ = await get_page(link);
-      let pd_samples = [...doc_.querySelectorAll("#log>tbody>tr")].map((tr) =>
-        [...tr.childNodes].map((td) => td.textContent.trim())
-      );
-      let header = [...doc_.querySelectorAll(".crf_preText")].map((a) =>
-        a.textContent.trim()
-      );
-      let content = [...doc_.querySelectorAll(".crf_dataPoint")].map((a) =>
-        a.textContent.trim()
-      );
-      return { header, content, pd_samples };
-  }
+  _parse_vst_PD = async (link) => {
+    let doc_ = await get_page(link);
+    let pd_samples = [...doc_.querySelectorAll("#log>tbody>tr")].map((tr) =>
+      [...tr.childNodes].map((td) => td.textContent.trim())
+    );
+    let header = [...doc_.querySelectorAll(".crf_preText")].map((a) =>
+      a.textContent.trim()
+    );
+    let content = [...doc_.querySelectorAll(".crf_dataPoint")].map((a) =>
+      a.textContent.trim()
+    );
+    return { header, content, pd_samples };
+  };
 
   parse_1st_drug = async () => {
     let url_prefix = location.href.split("/SubjectPage.aspx")[0];
