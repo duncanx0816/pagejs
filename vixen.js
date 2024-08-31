@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         vixen
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      2024-08-31
 // @description  try to take over the world!
 // @author       You
 // @match        https://www.vixen.com/*
@@ -152,6 +152,7 @@ async function until(expr, ntime = 20, delta = 3000) {
 
 (async function () {
   "use strict";
+  document.querySelector('.AgeVerificationModal__EnterButton-sc-578udq-11').click();  
   await until(`document.querySelector('script#__NEXT_DATA__')`);
   console.log(
     JSON.parse(document.querySelector("script#__NEXT_DATA__").innerHTML).buildId
