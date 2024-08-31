@@ -33,7 +33,7 @@ sehuatang.net###threadlisttableid  tr > td > div.show-text2
 18comic.vip##div.col-lg-3.col-md-3.col-sm-3.col-xs-6
 xsijishe.net###hornbox
 xsijishe.net##div.nex_Product_unextend
-xsijishe.net##div.viewbox.otherfloor.cl
+#xsijishe.net##div.viewbox.otherfloor.cl
 xsijishe.net###wp > div.nex_junctionport
 xsijishe.net###ct > div.nex_mid_ads
 xsijishe.net##.nexfooter
