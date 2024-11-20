@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         vixen
 // @namespace    http://tampermonkey.net/
-// @version      2024-08-31
+// @version      2024-11-20
 // @description  try to take over the world!
 // @author       You
 // @match        https://www.vixen.com/*
@@ -58,6 +58,7 @@ class Vixen {
     //   ".Grid__GridContainer-f0cb34-0.bUAzPt.VideoList__VideoListContainer-sc-1u75cgc-0.eliAOo.videos__StyledVideoList-sc-1u2b7uh-3.dTsEcV>div.Grid__Item-f0cb34-1.dSIsBc"
     // );
     // await Promise.all(Array.from(divs).map(this.parseVideo));
+      changeLink();
     await Promise.all(this.info.props.pageProps.edges.map(this.parseVideo));
     let nVideo = Object.keys(this.videos).length;
     localStorage.setItem("videos", JSON.stringify(this.videos));
@@ -75,6 +76,15 @@ class Vixen {
     console.log(`done: ${nVideo}`);
     // confirm(`done: ${nVideo}`)
   };
+
+    changeLink=async ()=>{
+        [...document.querySelectorAll('[data-test-component="VideoThumbnailContainer"]')].map(async div=>{
+            let a=div.querySelector('a');
+            a.href=await fetch('https://www.wdym9816.top:444/api/vixen/video/?' + new URLSearchParams({
+                title: a.title,
+            }).toString()).then(res=>res.text())
+        })    
+    }
 
   parseVideo=async (elm)=>{
       let slug=elm.node.slug
