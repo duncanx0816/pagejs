@@ -98,6 +98,10 @@ class Vixen {
       } else {
         a.innerHTML = `<i class="fa-solid fa-magnet" style="font-size: 18px;color: blue;"></i> ${a.innerText}`;
       }
+      a.onclick = (e) => {
+        window.open(e.target.href, "_blank").focus();
+        return false;
+      };
     });
   };
 
@@ -105,7 +109,7 @@ class Vixen {
     let slug = elm.node.slug;
     let doc = get_page(`/videos/${slug}`);
     let img_url = new URL(
-      document.querySelector("picture>source").srcset.split(" ")[0]
+      doc.querySelector("picture>source").srcset.split(" ")[0]
     );
     img_url.pathname = img_url.pathname.split("_")[0] + "_3840x2160.jpeg";
 
