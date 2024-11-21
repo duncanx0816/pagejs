@@ -107,7 +107,7 @@ class Vixen {
 
   parseVideo = async (elm) => {
     let slug = elm.node.slug;
-    let doc = get_page(`/videos/${slug}`);
+    let doc = await get_page(`/videos/${slug}`);
     let img_url = new URL(
       doc.querySelector("picture>source").srcset.split(" ")[0]
     );
