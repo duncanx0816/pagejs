@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         vixen
 // @namespace    http://tampermonkey.net/
-// @version      2024-11-20
+// @version      2024-11-21
 // @description  try to take over the world!
 // @author       You
 // @match        https://www.vixen.com/*
@@ -16,15 +16,17 @@
 // @grant        GM_openInTab
 // ==/UserScript==
 
-
 const get_page = async (url) => {
-    let res = await fetch(url).then((res) => res.text());
-    return new DOMParser().parseFromString(res, "text/html");
+  let res = await fetch(url).then((res) => res.text());
+  return new DOMParser().parseFromString(res, "text/html");
 };
-
 
 class Vixen {
   constructor() {
+    let script = document.createElement("script");
+    script.src = "https://kit.fontawesome.com/0f14166b22.js";
+    document.body.appendChild(script);
+
     this.studio = location.host.split(".")[1];
     this.videos = JSON.parse(localStorage.getItem("videos") || "{}");
     this.info = JSON.parse(
@@ -58,7 +60,7 @@ class Vixen {
     //   ".Grid__GridContainer-f0cb34-0.bUAzPt.VideoList__VideoListContainer-sc-1u75cgc-0.eliAOo.videos__StyledVideoList-sc-1u2b7uh-3.dTsEcV>div.Grid__Item-f0cb34-1.dSIsBc"
     // );
     // await Promise.all(Array.from(divs).map(this.parseVideo));
-      changeLink();
+    this.changeLink();
     await Promise.all(this.info.props.pageProps.edges.map(this.parseVideo));
     let nVideo = Object.keys(this.videos).length;
     localStorage.setItem("videos", JSON.stringify(this.videos));
@@ -77,29 +79,44 @@ class Vixen {
     // confirm(`done: ${nVideo}`)
   };
 
-    changeLink=async ()=>{
-        [...document.querySelectorAll('[data-test-component="VideoThumbnailContainer"]')].map(async div=>{
-            let a=div.querySelector('a');
-            a.href=await fetch('https://www.wdym9816.top:444/api/vixen/video/?' + new URLSearchParams({
-                title: a.title,
-            }).toString()).then(res=>res.text())
-        })    
-    }
-
-  parseVideo=async (elm)=>{
-      let slug=elm.node.slug
-      let doc=get_page(`/videos/${slug}`)
-      let img_url=new URL(document.querySelector('picture>source').srcset.split(' ')[0])
-      img_url.pathname=img_url.pathname.split('_')[0]+'_3840x2160.jpeg'
-  
-      if (!(slug in this.videos)){
-          setTimeout(() => {
-              GM_openInTab(img_url.href)
-          }, parseInt(Math.random() * 1000));
+  changeLink = async () => {
+    [
+      ...document.querySelectorAll(
+        '[data-test-component="VideoThumbnailContainer"]'
+      ),
+    ].map(async (div) => {
+      let a = div.querySelector("a");
+      let { status, link } = await fetch(
+        "https://www.wdym9816.top:444/api/vixen/video/?" +
+          new URLSearchParams({
+            title: a.title,
+          }).toString()
+      ).then((res) => res.json());
+      a.href = link;
+      if (status == "done") {
+        a.innerHTML = `<i class="fa-solid fa-video" style="font-size: 18px;color: blue;"></i> ${a.innerText}`;
+      } else {
+        a.innerHTML = `<i class="fa-solid fa-magnet" style="font-size: 18px;color: blue;"></i> ${a.innerText}`;
       }
-      this.videos[slug] = img_url
-  }
-  
+    });
+  };
+
+  parseVideo = async (elm) => {
+    let slug = elm.node.slug;
+    let doc = get_page(`/videos/${slug}`);
+    let img_url = new URL(
+      document.querySelector("picture>source").srcset.split(" ")[0]
+    );
+    img_url.pathname = img_url.pathname.split("_")[0] + "_3840x2160.jpeg";
+
+    if (!(slug in this.videos)) {
+      setTimeout(() => {
+        GM_openInTab(img_url.href);
+      }, parseInt(Math.random() * 1000));
+    }
+    this.videos[slug] = img_url;
+  };
+
   parseVideo2 = async (elm) => {
     let slug = elm
       .querySelector(
@@ -162,7 +179,12 @@ async function until(expr, ntime = 20, delta = 3000) {
 
 (async function () {
   "use strict";
-  document.querySelector('.AgeVerificationModal__EnterButton-sc-578udq-11').click();  
+  let el = document.querySelector(
+    ".AgeVerificationModal__EnterButton-sc-578udq-11"
+  );
+  if (el) {
+    el.click();
+  }
   await until(`document.querySelector('script#__NEXT_DATA__')`);
   console.log(
     JSON.parse(document.querySelector("script#__NEXT_DATA__").innerHTML).buildId
