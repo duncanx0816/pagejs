@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         vixen
 // @namespace    http://tampermonkey.net/
-// @version      2024-11-21
+// @version      2024-11-22
 // @description  try to take over the world!
 // @author       You
 // @match        https://www.vixen.com/*
@@ -73,7 +73,7 @@ class Vixen {
     let a = document.createElement("a");
     a.download = `${this.studio}.${new Date().getTime()}.${nVideo}.json`;
     a.href = URL.createObjectURL(blob);
-    a.click();
+    // a.click();
 
     console.log(`done: ${nVideo}`);
     // confirm(`done: ${nVideo}`)
