@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         vixen
 // @namespace    http://tampermonkey.net/
-// @version      2024-11-22
+// @version      2024-11-23
 // @description  try to take over the world!
 // @author       You
 // @match        https://www.vixen.com/*
@@ -95,7 +95,9 @@ class Vixen {
       a.href = link;
       if (status == "done") {
         a.innerHTML = `<i class="fa-solid fa-video" style="font-size: 18px;color: blue;"></i> ${a.innerText}`;
-      } else {
+      } else if (link.endsWith('.mkv')){
+        a.innerHTML = `<i class="fa-solid fa-magnet" style="font-size: 18px;color: red;"></i> ${a.innerText}`;
+      }else{
         a.innerHTML = `<i class="fa-solid fa-magnet" style="font-size: 18px;color: blue;"></i> ${a.innerText}`;
       }
       a.onclick = (e) => {
