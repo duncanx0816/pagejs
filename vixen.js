@@ -1,9 +1,11 @@
 // ==UserScript==
 // @name         vixen
 // @namespace    http://tampermonkey.net/
-// @version      2024-11-23
+// @version      2024-11-24
 // @description  try to take over the world!
 // @author       You
+// @updateURL    https://raw.githubusercontent.com/duncanx0816/pagejs/main/vixen.js
+// @downloadURL  https://raw.githubusercontent.com/duncanx0816/pagejs/main/vixen.js
 // @match        https://www.vixen.com/*
 // @match        https://www.blacked.com/*
 // @match        https://www.blackedraw.com/*
@@ -57,9 +59,11 @@ class Vixen {
         "div.VideosSidebar__Main-sc-11jbuek-1.AJrQs"
       ).style.display = "none";
     }
-
+    // let divs = document.querySelectorAll(
+    //   ".Grid__GridContainer-f0cb34-0.bUAzPt.VideoList__VideoListContainer-sc-1u75cgc-0.eliAOo.videos__StyledVideoList-sc-1u2b7uh-3.dTsEcV>div.Grid__Item-f0cb34-1.dSIsBc"
+    // );
+    // await Promise.all(Array.from(divs).map(this.parseVideo));
     this.changeLink();
-    
     await Promise.all(this.info.props.pageProps.edges.map(this.parseVideo));
     let nVideo = Object.keys(this.videos).length;
     localStorage.setItem("videos", JSON.stringify(this.videos));
@@ -91,7 +95,7 @@ class Vixen {
             title: a.title,
           }).toString()
       ).then((res) => res.json());
-      a.href = link;
+      a.href = `potplayer://${link}`;
       if (status != "done") {
         a.innerHTML = `<i class="fa-solid fa-magnet" style="font-size: 18px;color: blue;"></i> ${a.innerText}`;
       } else if (link.endsWith('.mkv')){
