@@ -97,6 +97,7 @@ class Vixen {
       ).then((res) => res.json());
       a.href = `potplayer://${link}`;
       if (status != "done") {
+        a.href=link;
         a.innerHTML = `<i class="fa-solid fa-magnet" style="font-size: 18px;color: blue;"></i> ${a.innerText}`;
       } else if (link.endsWith('.mkv')){
         a.innerHTML = `<i class="fa-solid fa-video" style="font-size: 18px;color: grey;"></i> ${a.innerText}`;
