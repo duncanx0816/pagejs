@@ -52,15 +52,14 @@ class Vixen {
   };
 
   run = async () => {
-    if (document.querySelector("div.VideosSidebar__Main-sc-11jbuek-1.AJrQs"))
+    if (document.querySelector("div.VideosSidebar__Main-sc-11jbuek-1.AJrQs")){
       document.querySelector(
         "div.VideosSidebar__Main-sc-11jbuek-1.AJrQs"
       ).style.display = "none";
-    // let divs = document.querySelectorAll(
-    //   ".Grid__GridContainer-f0cb34-0.bUAzPt.VideoList__VideoListContainer-sc-1u75cgc-0.eliAOo.videos__StyledVideoList-sc-1u2b7uh-3.dTsEcV>div.Grid__Item-f0cb34-1.dSIsBc"
-    // );
-    // await Promise.all(Array.from(divs).map(this.parseVideo));
+    }
+
     this.changeLink();
+    
     await Promise.all(this.info.props.pageProps.edges.map(this.parseVideo));
     let nVideo = Object.keys(this.videos).length;
     localStorage.setItem("videos", JSON.stringify(this.videos));
@@ -93,12 +92,12 @@ class Vixen {
           }).toString()
       ).then((res) => res.json());
       a.href = link;
-      if (status == "done") {
-        a.innerHTML = `<i class="fa-solid fa-video" style="font-size: 18px;color: blue;"></i> ${a.innerText}`;
-      } else if (link.endsWith('.mkv')){
-        a.innerHTML = `<i class="fa-solid fa-magnet" style="font-size: 18px;color: grey;"></i> ${a.innerText}`;
-      }else{
+      if (status != "done") {
         a.innerHTML = `<i class="fa-solid fa-magnet" style="font-size: 18px;color: blue;"></i> ${a.innerText}`;
+      } else if (link.endsWith('.mkv')){
+        a.innerHTML = `<i class="fa-solid fa-video" style="font-size: 18px;color: grey;"></i> ${a.innerText}`;
+      }else{
+        a.innerHTML = `<i class="fa-solid fa-video" style="font-size: 18px;color: blue;"></i> ${a.innerText}`;
       }
       a.onclick = (e) => {
         window.open(e.target.href, "_blank").focus();
