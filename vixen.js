@@ -96,7 +96,7 @@ class Vixen {
       if (status == "done") {
         a.innerHTML = `<i class="fa-solid fa-video" style="font-size: 18px;color: blue;"></i> ${a.innerText}`;
       } else if (link.endsWith('.mkv')){
-        a.innerHTML = `<i class="fa-solid fa-magnet" style="font-size: 18px;color: red;"></i> ${a.innerText}`;
+        a.innerHTML = `<i class="fa-solid fa-magnet" style="font-size: 18px;color: grey;"></i> ${a.innerText}`;
       }else{
         a.innerHTML = `<i class="fa-solid fa-magnet" style="font-size: 18px;color: blue;"></i> ${a.innerText}`;
       }
