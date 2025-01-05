@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         vixen
 // @namespace    http://tampermonkey.net/
-// @version      2024-11-26
+// @version      2025-01-04
 // @description  try to take over the world!
 // @author       You
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=vixen.com
@@ -85,6 +85,7 @@ class Vixen {
             let { status, link } = await fetch(
                 "https://www.wdym9816.top:444/api/vixen/video/?" +
                 new URLSearchParams({
+                    studio: location.host.split('.')[1],
                     title: a.title,
                 }).toString()
             ).then((res) => res.json());
@@ -98,7 +99,7 @@ class Vixen {
                 a.innerHTML = `<i class="fa-solid fa-video" style="font-size: 18px;color: blue;"></i> ${a.innerText}`;
             }
             a.onclick = (e) => {
-                window.open(e.target.href, "_blank").focus();
+                window.open(e.target.href, "_blank");
                 return false;
             };
         });
