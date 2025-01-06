@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         vixen
 // @namespace    http://tampermonkey.net/
-// @version      2025-01-04
+// @version      2025-01-05
 // @description  try to take over the world!
 // @author       You
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=vixen.com
@@ -83,7 +83,7 @@ class Vixen {
         ].map(async (div) => {
             let a = div.querySelector("a");
             let { status, link } = await fetch(
-                "https://www.wdym9816.top:444/api/vixen/video/?" +
+                "https://www.wdym9816.top/api/vixen/video/?" +
                 new URLSearchParams({
                     studio: location.host.split('.')[1],
                     title: a.title,
@@ -156,7 +156,7 @@ class Vixen {
 
     update = () => {
         console.log(this.info);
-        let url = "https://www.wdym9816.top:444/api/update/vixen/";
+        let url = "https://www.wdym9816.top/api/update/vixen/";
         return fetch(url, {
             method: "POST",
             mode: "cors",
