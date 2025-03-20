@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         vixen
 // @namespace    http://tampermonkey.net/
-// @version      2025-03-05
+// @version      2025-03-06
 // @description  try to take over the world!
 // @author       You
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=vixen.com
@@ -187,12 +187,12 @@ async function until(expr, ntime = 20, delta = 3000) {
     script.src = "https://kit.fontawesome.com/0f14166b22.js";
     document.body.appendChild(script);
 
-    let el = document.querySelector('[data-test-component="AgeVerificationOverlay2"]')
+    let el = document.querySelector('[data-test-component="AgeVerificationOverlay"]')
     if(el){
         el.style.display='none'
     }
 
-    let el = document.querySelector(
+    el = document.querySelector(
         ".AgeVerificationModal__EnterButton-sc-578udq-11"
     );
     if (el) {
