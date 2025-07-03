@@ -31,6 +31,7 @@ class Subject {
     run = async () => {
         await this.parse_vstInfo();
         await this.parse_efficacy();
+        await this.parse_screen();
 
         let blob = new Blob(
             [
