@@ -80,6 +80,7 @@ class Subject {
         let href = document.querySelector('#_ctl0_LeftNav_EDCTaskList_TblTaskItems a[title="筛选期 "]')?.href;
         if (href) {
             let doc = await get_page(href);
+            let doc_;
 
             href = doc.querySelector('#_ctl0_LeftNav_EDCTaskList_TblTaskItems a[title^="肿瘤诊断"]')?.href;
             if (href) {
