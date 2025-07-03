@@ -21,6 +21,7 @@ class Subject {
         this.vstInfo = [];
         this.efficacy = [];
         this.screen=[];
+        this.disease=[];
 
         this.subID = document
             .querySelector("#_ctl0_PgHeader_TabTextHyperlink3")
@@ -40,6 +41,7 @@ class Subject {
                     vstInfo: this.vstInfo,
                     efficacy: this.efficacy,
                     screen: this.screen,
+                    disease: this.disease,
                 }),
             ],
             {
@@ -78,10 +80,19 @@ class Subject {
         let href = document.querySelector('#_ctl0_LeftNav_EDCTaskList_TblTaskItems a[title="筛选期 "]')?.href;
         if (href) {
             let doc = await get_page(href);
+
+            href = doc.querySelector('#_ctl0_LeftNav_EDCTaskList_TblTaskItems a[title^="肿瘤诊断"]')?.href;
+            if (href) {
+                doc_ = await get_page(href);
+                this.disease = [...doc_.querySelectorAll('#_ctl0_Content_R > table > tbody > tr')].map(tr => {
+                    return [...tr.querySelectorAll(':scope > td')].map(td => td.innerText)
+                }).filter(e => e[0])
+            }
+            
             href = doc.querySelector('#_ctl0_LeftNav_EDCTaskList_TblTaskItems a[title^="筛选结论"]')?.href;
             if (href) {
-                doc = await get_page(href);
-                this.screen = [...doc.querySelectorAll('#_ctl0_Content_R > table > tbody > tr')].map(tr => {
+                doc_ = await get_page(href);
+                this.screen = [...doc_.querySelectorAll('#_ctl0_Content_R > table > tbody > tr')].map(tr => {
                     return [...tr.querySelectorAll(':scope > td')].map(td => td.innerText)
                 }).filter(e => e[0])
             }
