@@ -15,6 +15,26 @@ const get_page = async (url) => {
     return new DOMParser().parseFromString(res, "text/html");
 };
 
+const get_sub_page = async (doc, target) => {
+    let formdata = new FormData();
+    formdata.append('__EVENTTARGET', target)
+    formdata.append('__EVENTARGUMENT', '')
+    formdata.append('__VIEWSTATE', doc.querySelector('#__VIEWSTATE').value)
+    formdata.append('__VIEWSTATEGENERATOR', doc.querySelector('#__VIEWSTATEGENERATOR').value)
+    formdata.append('_ctl0:Content:TsBox:CBoxC:_ctl1', 1)
+    formdata.append('_ctl0:Content:TsBox:CBoxC:SubjectTaskSummary:cBox0:TSCAjaxBox0:_ctl0', 0)
+    formdata.append('_ctl0:Content:TsBox:CBoxC:SubjectTaskSummary:cBox0:IsCollapsedInput', 0)
+    formdata.append('_ctl0:Content:TsBox:IsCollapsedInput', 1)
+
+    let doc_ = await fetch(location.href, {
+        method: "POST",
+        body: formdata
+    })
+        .then((res) => res.text())
+        .then((res) => new DOMParser().parseFromString(res, "text/html"));
+    return doc_
+}
+
 class Subject {
     constructor() {
         this.fstDrug;
@@ -58,7 +78,15 @@ class Subject {
     parse_vstInfo = async () => {
         this.vstInfo = [...document.querySelectorAll('#GRID tr')].map(tr => {
             return [...tr.querySelectorAll('td')].map(td => td.innerText)
-        })
+        });
+        await Promise.all([...document.querySelectorAll('#GRID tr:last-of-type a')].map(a => {
+            get_sub_page(document, a.href.split("'")[1]).then(doc => {
+                let vstInfo = [...doc.querySelectorAll('#_ctl0_Content__ctl0_GRID tr')].map(tr => {
+                    return [...tr.querySelectorAll('td')].map(td => td.innerText)
+                })
+                this.vstInfo = [...this.vstInfo, ...vstInfo]
+            })
+        }))
     }
 
     parse_efficacy = async () => {
@@ -89,7 +117,7 @@ class Subject {
                     return [...tr.querySelectorAll(':scope > td')].map(td => td.innerText)
                 }).filter(e => e[0])
             }
-            
+
             href = doc.querySelector('#_ctl0_LeftNav_EDCTaskList_TblTaskItems a[title^="筛选结论"]')?.href;
             if (href) {
                 doc_ = await get_page(href);
