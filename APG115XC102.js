@@ -81,8 +81,8 @@ class Subject {
         this.vstInfo = [...document.querySelectorAll('#GRID tr')].map(tr => {
             return [...tr.querySelectorAll('td')].map(td => td.innerText)
         });
-        await Promise.all([...document.querySelectorAll('#GRID tr:last-of-type a')].map(a => {
-            get_sub_page(document, a.href.split("'")[1]).then(doc => {
+        await Promise.all([...document.querySelectorAll('#GRID tr:last-of-type a')].map(async a => {
+            await get_sub_page(document, a.href.split("'")[1]).then(doc => {
                 let vstInfo = [...doc.querySelectorAll('#_ctl0_Content__ctl0_GRID tr')].map(tr => {
                     return [...tr.querySelectorAll('td')].map(td => td.innerText)
                 })
@@ -139,10 +139,8 @@ class SubjectList {
     }
 
     run = async () => {
-        this.pages=[...document.querySelectorAll('#_ctl0_Content_ListDisplayNavigation_dgObjects > tbody > tr >td > a[href]')].map(a => a.href)
-
-        await Promise.all([...document.querySelectorAll('#_ctl0_Content_ListDisplayNavigation_DlPagination a')].map(a => {
-            get_sub_page(document, a.href.split("'")[1]).then(doc => {
+        await Promise.all([...document.querySelectorAll('#_ctl0_Content_ListDisplayNavigation_DlPagination a')].map(async a => {
+            await get_sub_page(document, a.href.split("'")[1]).then(doc => {
                 let pages=[...doc.querySelectorAll('#_ctl0_Content_ListDisplayNavigation_dgObjects > tbody > tr >td > a[href]')].map(a => a.href)
                 this.pages=[...this.pages, ...pages]
             })
@@ -159,7 +157,7 @@ class SubjectList {
 
     if (location.pathname.endsWith('HomePage.aspx') && location.search.startsWith('?LD_StudySiteID=')) {
         let ss = new SubjectList(document);
-        console.log(ss.info)
+        console.log(ss.pages)
     } else if (location.pathname.endsWith('SubjectPage.aspx')) {
         new Subject(document);
     }
