@@ -133,21 +133,50 @@ class Subject {
 }
 
 class SubjectList {
-    constructor() {
+    constructor(doc) {
+        this.doc = doc;
         this.pages = [];
-        this.run();
     }
 
     run = async () => {
-        await Promise.all([...document.querySelectorAll('#_ctl0_Content_ListDisplayNavigation_DlPagination a')].map(async a => {
-            await get_sub_page(document, a.href.split("'")[1]).then(doc => {
-                let pages=[...doc.querySelectorAll('#_ctl0_Content_ListDisplayNavigation_dgObjects > tbody > tr >td > a[href]')].map(a => a.href)
-                this.pages=[...this.pages, ...pages]
+        await Promise.all([...this.doc.querySelectorAll('#_ctl0_Content_ListDisplayNavigation_DlPagination a')].map(async a => {
+            await get_sub_page(this.doc, a.href.split("'")[1]).then(doc => {
+                let pages = [...doc.querySelectorAll('#_ctl0_Content_ListDisplayNavigation_dgObjects > tbody > tr >td > a[href]')].map(a => `#${a.innerText}\nstart "${a.href}"\n`)
+                this.pages = [...this.pages, ...pages]
             })
         }))
 
-        await Promise.all(this.pages.map(link => GM_openInTab(link)))
+        // await Promise.all(this.pages.map(link => GM_openInTab(link)))
+        // window.close();
+        return this.pages;
+    }
+}
 
+class Study {
+    constructor() {
+        this.pages = []
+        this.run()
+    }
+
+    run = async () => {
+        await Promise.all([...document.querySelectorAll('#_ctl0_Content_ListDisplayNavigation_dgObjects a')].map(async a => {
+            let doc = await get_page(a.href)
+            let pages = await new SubjectList(doc).run();
+            this.pages = [...this.pages, ...pages]
+        }))
+
+        let blob = new Blob(
+            [
+                this.pages.sort().join('')
+            ],
+            {
+                type: "text/plain",
+            }
+        );
+        let a = document.createElement("a");
+        a.download = `${document.querySelector('#_ctl0_PgHeader_TabTextHyperlink1').title}.sh`;
+        a.href = URL.createObjectURL(blob);
+        a.click();
         window.close();
     }
 }
@@ -158,6 +187,8 @@ class SubjectList {
     if (location.pathname.endsWith('HomePage.aspx') && location.search.startsWith('?LD_StudySiteID=')) {
         let ss = new SubjectList(document);
         console.log(ss.pages)
+    } else if (location.pathname.endsWith('HomePage.aspx') && location.search.startsWith('?LD_StudyID=')) {
+        new Study();
     } else if (location.pathname.endsWith('SubjectPage.aspx')) {
         new Subject(document);
     }
