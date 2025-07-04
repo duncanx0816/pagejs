@@ -40,8 +40,8 @@ class Subject {
         this.fstDrug;
         this.vstInfo = [];
         this.efficacy = [];
-        this.screen=[];
-        this.disease=[];
+        this.screen = [];
+        this.disease = [];
 
         this.subID = document
             .querySelector("#_ctl0_PgHeader_TabTextHyperlink3")
@@ -50,8 +50,8 @@ class Subject {
     }
 
     run = async () => {
-        document.title=document.querySelector('#_ctl0_PgHeader_TabTextHyperlink3').title;
-        
+        document.title = document.querySelector('#_ctl0_PgHeader_TabTextHyperlink3').title;
+
         await this.parse_vstInfo();
         await this.parse_efficacy();
         await this.parse_screen();
@@ -134,11 +134,23 @@ class Subject {
 
 class SubjectList {
     constructor() {
-        this.info = [];
-        [...document.querySelectorAll('#_ctl0_Content_ListDisplayNavigation_dgObjects > tbody > tr >td > a[href]')].forEach(a => {
-            GM_openInTab(a.href);
-            window.close();
-        })
+        this.pages = [];
+        this.run();
+    }
+
+    run = async () => {
+        this.pages=[...document.querySelectorAll('#_ctl0_Content_ListDisplayNavigation_dgObjects > tbody > tr >td > a[href]')].map(a => a.href)
+
+        await Promise.all([...document.querySelectorAll('#_ctl0_Content_ListDisplayNavigation_DlPagination a')].map(a => {
+            get_sub_page(document, a.href.split("'")[1]).then(doc => {
+                let pages=[...doc.querySelectorAll('#_ctl0_Content_ListDisplayNavigation_dgObjects > tbody > tr >td > a[href]')].map(a => a.href)
+                this.pages=[...this.pages, ...pages]
+            })
+        }))
+
+        await Promise.all(this.pages.map(link => GM_openInTab(link)))
+
+        window.close();
     }
 }
 
