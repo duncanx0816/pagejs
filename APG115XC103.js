@@ -50,6 +50,8 @@ class Subject {
     }
 
     run = async () => {
+        document.title=document.querySelector('#_ctl0_PgHeader_TabTextHyperlink3').title;
+        
         await this.parse_vstInfo();
         await this.parse_efficacy();
         await this.parse_screen();
