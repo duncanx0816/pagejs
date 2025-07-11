@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         vixen
 // @namespace    http://tampermonkey.net/
-// @version      2025-03-06
+// @version      2025-07-06
 // @description  try to take over the world!
 // @author       You
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=vixen.com
@@ -183,6 +183,7 @@ async function until(expr, ntime = 20, delta = 3000) {
 
 (async function () {
     "use strict";
+    until('document.body', delta=1000);
     let script = document.createElement("script");
     script.src = "https://kit.fontawesome.com/0f14166b22.js";
     document.body.appendChild(script);
