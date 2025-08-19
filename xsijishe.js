@@ -5,6 +5,7 @@
 // @description  try to take over the world!
 // @author       You
 // @match        https://xsijishe.com/home.php?*do=favorite*
+// @match        https://xsijishe.com/forum.php?*mod=forumdisplay*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=xsijishe.com
 // @grant        unsafeWindow
 // ==/UserScript==
@@ -61,6 +62,30 @@ const delFav = async (href) => {
         } catch (e) {
             console.log(href, e, srt)
         }
+    })
+
+    document.querySelectorAll('.nex_forumlist_pics>ul').forEach(ul=>{
+        ul.style.display = 'flex';
+        ul.style.overflow = 'auto';
+        ul.querySelectorAll('li').forEach(li=>{
+            li.style.display = 'block';
+            li.style.overflow = 'unset';
+            li.style.height = '300px';
+            li.style.width = '400px';
+        });
+        ul.querySelectorAll('.nex_thread_pics').forEach(div=>{
+            div.style.height = '300px';
+            div.style.width = '400px';
+        });
+        ul.querySelectorAll('.nex_thread_pics a').forEach(a=>{
+            a.style.height = '300px';
+            a.style.width = '400px';
+        });
+    })
+
+    let html =`<a><span class="nex_reply" style=" background: #F39A07; width: 20px; height: 20px; padding-left: 0px; margin: 0px 10px; "><i style=" background: url(https://sjs47.com/template/nex_manga_181008/neoconex/viewthread/vt_favourite.png) center no-repeat; width: 20px; height: 20px; display: block; "></i></span></a>`
+    document.querySelectorAll('.z.nex_list_infos').forEach(e=>{
+        e.insertAdjacentHTML('beforeend', html)
     })
 
 })();
