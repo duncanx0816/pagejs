@@ -74,12 +74,6 @@ const imgCenter = (cssSeletor) => {
 };
 
 (function () {
-  [
-    ".nex_acgcommon_img",
-    ".nex_newrecos_img",
-    ".nex_ctbpic",
-    ".nexproul>li",
-  ].forEach(imgCenter);
   document.querySelector(".nex_Product_unextend")?.remove();
   document.querySelector(".ct2>.sd")?.remove();
   document.querySelector(".ct2>.mn>.drag")?.remove();
@@ -160,4 +154,11 @@ const imgCenter = (cssSeletor) => {
       return false;
     };
   });
+
+  [
+    ".nex_acgcommon_img",
+    ".nex_newrecos_img",
+    ".nex_ctbpic",
+    ".nexproul>li",
+  ].forEach(imgCenter);
 })();
