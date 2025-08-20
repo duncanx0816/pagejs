@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         xsijishe
 // @namespace    http://tampermonkey.net/
-// @version      20250821
+// @version      20250822
 // @description  try to take over the world!
 // @author       You
 // @match        https://xsijishe.com/*
@@ -77,7 +77,13 @@ const imgCenter = (cssSeletor) => {
   let key = location.host.split(".")[0];
   let readedURLs = new Set(JSON.parse(localStorage.getItem(key) || "[]"));
   let urls = [...document.querySelectorAll(".nex_forumtit_top>a.s.xst")].map(
-    (e) => e.href
+    (a) => {
+      let href = a.href;
+      if (readedURLs.has(href)) {
+        a.style.color = "#999";
+      }
+      return href;
+    }
   );
   localStorage.setItem(key, JSON.stringify([...readedURLs, ...urls]));
 
