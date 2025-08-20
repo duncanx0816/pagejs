@@ -32,7 +32,6 @@ ckkp8.xyz##div.uk-container-center.uk-container:nth-child(2) > div.uk-grid > div
 sehuatang.net###threadlisttableid  tr > td > div.show-text2
 18comic.vip##div.col-lg-3.col-md-3.col-sm-3.col-xs-6
 xsijishe.net###hornbox
-xsijishe.net##div.nex_Product_unextend
 #xsijishe.net##div.viewbox.otherfloor.cl
 xsijishe.net###wp > div.nex_junctionport
 xsijishe.net###ct > div.nex_mid_ads
@@ -40,6 +39,10 @@ xsijishe.net##.nexfooter
 xsijishe.net##div.nex_forum_lists:has(a.showhide.y)
 xsijishe.net###ct > div.sd
 xsijishe.net##td.plc.plm
+xsijishe.com##.nex_Product_unextend
+xsijishe.com##.ct2>.sd
+xsijishe.com##.ct2>.mn>.drag
+xsijishe.com##.nex_junctionport
 q779yl.xyz###ajaxtable tr:has(a>font>b)
 q779yl.xyz##a:has(font>b)
 q779yl.xyz##tr:has(img[title="置顶帖标志"])
