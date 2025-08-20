@@ -110,14 +110,13 @@ const imgCenter = (cssSeletor) => {
   });
 
   document.querySelectorAll("#k_favorite").forEach((a) => {
-    a.onclick = () => addFav(a.href);
+    a.onclick = () => addFav(a.href).then(() => a.remove());
   });
 
   [...document.querySelectorAll("#favorite_ul>li")].forEach(async (li) => {
     let a = li.querySelector("a");
     a.onclick = () => {
-      delFav(a.href);
-      li.remove();
+      delFav(a.href).then(() => li.remove());
     };
 
     let href = li.querySelector("a:last-of-type").href;
@@ -150,8 +149,9 @@ const imgCenter = (cssSeletor) => {
       if (realLink) {
         let doc = await get_page(realLink);
         let url = doc.querySelector("#k_favorite")?.href;
-        addFav(url, realLink);
-        div.querySelector("a").remove();
+        addFav(url, realLink).then(() => {
+          div.querySelector("a").remove();
+        });
       }
       event.preventDefault();
       return false;
