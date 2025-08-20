@@ -80,6 +80,9 @@ const imgCenter = (cssSeletor) => {
   document.querySelector(".nex_junctionport")?.remove();
   document.querySelector("#hornbox")?.remove();
   document
+    .querySelectorAll(".nex_forum_lists:has(a.showhide.y)")
+    .forEach((e) => e.remove());
+  document
     .querySelectorAll(".nex_top_bg")
     .forEach((e) => (e.style.height = "50px"));
   document
