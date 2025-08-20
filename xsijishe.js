@@ -47,7 +47,7 @@ const delFav = async (href, referer = location.href) => {
 };
 
 const getRealLink = async (href) => {
-  return href;
+  //return href;
   let doc = await get_page(href);
   let srt =
     "location2={href:''};location2.assign=function(val){this.href=val};location2.replace=function(val){this.href=val};" +
@@ -74,6 +74,13 @@ const imgCenter = (cssSeletor) => {
 };
 
 (function () {
+  let key = location.host.split(".")[0];
+  let readedURLs = new Set(JSON.parse(localStorage.getItem(key) || "[]"));
+  let urls = [...document.querySelectorAll(".nex_forumtit_top>a.s.xst")].map(
+    (e) => e.href
+  );
+  localStorage.setItem(key, JSON.stringify([...readedURLs, ...urls]));
+
   document.querySelector(".nex_Product_unextend")?.remove();
   document.querySelector(".ct2>.sd")?.remove();
   document.querySelector(".ct2>.mn>.drag")?.remove();
