@@ -73,6 +73,32 @@ const imgCenter = (cssSeletor) => {
   });
 };
 
+const getPageInfo = async (url) => {
+  let key = location.host.split(".")[0];
+  let res = await fetch(
+    `https://www.wdym9816.top/track/${key}/page?url=${encodeURIComponent(url)}`
+  );
+  if (res.ok) {
+    return res.json();
+  } else {
+    console.error("Failed to fetch page info:", res.statusText);
+    return null;
+  }
+};
+
+const postPageInfo = async (url, imgs, realLink = null) => {
+  let key = location.host.split(".")[0];
+  return fetch(`https://www.wdym9816.top/track/${key}/page`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      url: url,
+      realLink: realLink,
+      imgs: imgs.join(";"),
+    }),
+  });
+};
+
 (function () {
   let key = location.host.split(".")[0];
   fetch(`https://www.wdym9816.top/track/${key}`)
@@ -114,6 +140,7 @@ const imgCenter = (cssSeletor) => {
     .querySelectorAll(".ct2>.mn")
     .forEach((e) => e.style.setProperty("width", "1150px", "important"));
   document.querySelectorAll(".nex_forumlist_pics>ul").forEach((ul) => {
+    let url = ul.parentElement.parentElement.querySelector("a").href;
     ul.parentElement.style.width = "100%";
     ul.style.display = "flex";
     ul.style.overflow = "auto";
@@ -124,14 +151,16 @@ const imgCenter = (cssSeletor) => {
       li.style.height = "300px";
       li.style.width = "400px";
     });
-    ul.querySelectorAll(".nex_thread_pics").forEach((div) => {
+    let imgs = [...ul.querySelectorAll(".nex_thread_pics")].map((div) => {
       div.style.height = "300px";
       div.style.width = "400px";
       div.style.display = "flex";
       div.style.alignItems = "center";
       let src = div.querySelector("a").style.background.split('"')[1];
       div.innerHTML = `<img id="aimg_2113312" aid="2113312" src="${src}" class="zoom" onclick="zoom(this, this.src, 0, 0, 0)" width="400" style=" object-fit: cover; height: 300px; " initialized="true">`;
+      return src;
     });
+    postPageInfo(url, imgs);
   });
 
   document.querySelectorAll("#k_favorite").forEach((a) => {
@@ -145,9 +174,14 @@ const imgCenter = (cssSeletor) => {
     };
 
     let href = li.querySelector("a:last-of-type").href;
+    console.log(await getPageInfo(href));
     let realLink = await getRealLink(href);
     if (realLink) {
       let doc2 = await get_page(realLink);
+      let imgs = [...doc2.querySelectorAll("img.zoom")].map(
+        (e) => e.attributes.file?.value
+      );
+      postPageInfo(href, imgs, realLink);
       let imgText = [...doc2.querySelectorAll("img.zoom")]
         .map((e) => {
           e.src = e.attributes.file?.value;
