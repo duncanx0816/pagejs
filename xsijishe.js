@@ -102,7 +102,7 @@ const postPageInfo = async (url, imgs, realLink = null) => {
 const getReadedLink = async () => {
   let key = location.host.split(".")[0];
   return fetch(`https://www.wdym9816.top/track/${key}`).then((res) => {
-    res?.json();
+    return res?.json();
   });
 };
 
