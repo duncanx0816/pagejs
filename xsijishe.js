@@ -115,6 +115,36 @@ const postReadedLink = async (urls) => {
   });
 };
 
+const getImgText = async (href) => {
+  let imgText = "";
+  let imgs = (await getPageInfo(href))?.imgs;
+  if (imgs?.length) {
+    imgText = imgs
+      .split(";")
+      .map(
+        (src) =>
+          `<img src="${src}" class="zoom" onclick="zoom(this, this.src, 0, 0, 0)" style="height:300px;width:fit-content">`
+      )
+      .join("");
+  } else {
+    let realLink = await getRealLink(href);
+    if (realLink) {
+      let doc2 = await get_page(realLink);
+      let imgs = [...doc2.querySelectorAll("img.zoom")].map(
+        (e) => e.attributes.file?.value || e?.src
+      );
+      postPageInfo(href, imgs, realLink);
+      imgText = [...doc2.querySelectorAll("img.zoom")]
+        .map((e) => {
+          e.src = e.attributes.file?.value || e?.src;
+          return e.outerHTML;
+        })
+        .join("");
+    }
+  }
+  return imgText || "";
+};
+
 (function () {
   getReadedLink().then((readedURLs) => {
     readedURLs = new Set(readedURLs || []);
@@ -167,7 +197,22 @@ const postReadedLink = async (urls) => {
       div.innerHTML = `<img src="${src}" class="zoom" onclick="zoom(this, this.src, 0, 0, 0)" width="400" style=" object-fit: cover; height: 300px; " initialized="true">`;
       return src;
     });
-    postPageInfo(url, imgs);
+    if (imgs.length > 0) {
+      postPageInfo(url, imgs);
+    } else {
+      getImgText(url).then((imgText) => {
+        if (imgText) {
+          ul.insertAdjacentHTML(
+            "beforeend",
+            `<div style="overflow:auto"><div style="display: flex; flex-wrap:no-wrap">${imgText}</div></div>`
+          );
+          ul.querySelectorAll("img.zoom").forEach((e) => {
+            e.style.height = "300px";
+            e.style.width = "fit-content";
+          });
+        }
+      });
+    }
   });
 
   document.querySelectorAll("#k_favorite").forEach((a) => {
@@ -181,15 +226,8 @@ const postReadedLink = async (urls) => {
     };
 
     let href = li.querySelector("a:last-of-type").href;
-    let imgs = (await getPageInfo(href)).imgs;
-    if (imgs.length > 0) {
-      let imgText = imgs
-        .split(";")
-        .map(
-          (src) =>
-            `<img src="${src}" class="zoom" onclick="zoom(this, this.src, 0, 0, 0)" style="height:300px;width:fit-content">`
-        )
-        .join("");
+    let imgText = await getImgText(href);
+    if (imgText) {
       li.insertAdjacentHTML(
         "beforeend",
         `<div style="overflow:auto"><div style="display: flex; flex-wrap:no-wrap">${imgText}</div></div>`
@@ -198,29 +236,6 @@ const postReadedLink = async (urls) => {
         e.style.height = "300px";
         e.style.width = "fit-content";
       });
-    } else {
-      let realLink = await getRealLink(href);
-      if (realLink) {
-        let doc2 = await get_page(realLink);
-        let imgs = [...doc2.querySelectorAll("img.zoom")].map(
-          (e) => e.attributes.file?.value
-        );
-        postPageInfo(href, imgs, realLink);
-        let imgText = [...doc2.querySelectorAll("img.zoom")]
-          .map((e) => {
-            e.src = e.attributes.file?.value;
-            return e.outerHTML;
-          })
-          .join("");
-        li.insertAdjacentHTML(
-          "beforeend",
-          `<div style="overflow:auto"><div style="display: flex; flex-wrap:no-wrap">${imgText}</div></div>`
-        );
-        li.querySelectorAll("img.zoom").forEach((e) => {
-          e.style.height = "300px";
-          e.style.width = "fit-content";
-        });
-      }
     }
   });
 
