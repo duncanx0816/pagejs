@@ -99,33 +99,38 @@ const postPageInfo = async (url, imgs, realLink = null) => {
   });
 };
 
-(function () {
+const getReadedLink = async () => {
   let key = location.host.split(".")[0];
-  fetch(`https://www.wdym9816.top/track/${key}`)
-    .then((res) => res.json())
-    .then((readedURLs_remote) => {
-      let readedURLs_loc = new Set(
-        JSON.parse(localStorage.getItem(key) || "[]")
-      );
-      let readedURLs = new Set([...readedURLs_loc, ...readedURLs_remote]);
-      let urls = [
-        ...document.querySelectorAll(".nex_forumtit_top>a.s.xst"),
-      ].map((a) => {
+  return fetch(`https://www.wdym9816.top/track/${key}`).then((res) => {
+    res?.json();
+  });
+};
+
+const postReadedLink = async (urls) => {
+  let key = location.host.split(".")[0];
+  return fetch(`https://www.wdym9816.top/track/${key}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ links: urls }),
+  });
+};
+
+(function () {
+  getReadedLink().then((readedURLs) => {
+    readedURLs = new Set(readedURLs || []);
+    let urls = [...document.querySelectorAll(".nex_forumtit_top>a.s.xst")].map(
+      (a) => {
         let href = a.href;
         if (readedURLs.has(href)) {
           a.style.color = "#999";
         }
         return href;
-      });
-      if (urls.length) {
-        localStorage.setItem(key, JSON.stringify([...readedURLs, ...urls]));
-        fetch(`https://www.wdym9816.top/track/${key}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ links: urls }),
-        });
       }
-    });
+    );
+    if (urls.length) {
+      postReadedLink(urls);
+    }
+  });
 
   document.querySelector(".nex_Product_unextend")?.remove();
   document.querySelector(".ct2>.sd")?.remove();
@@ -176,9 +181,10 @@ const postPageInfo = async (url, imgs, realLink = null) => {
     };
 
     let href = li.querySelector("a:last-of-type").href;
-    let imgs = (await getPageInfo(href))?.imgs?.split(";") || [];
+    let imgs = (await getPageInfo(href)).imgs;
     if (imgs.length > 0) {
       let imgText = imgs
+        .split(";")
         .map(
           (src) =>
             `<img src="${src}" class="zoom" onclick="zoom(this, this.src, 0, 0, 0)" style="height:300px;width:fit-content">`
