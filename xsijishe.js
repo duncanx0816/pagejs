@@ -117,12 +117,14 @@ const postPageInfo = async (url, imgs, realLink = null) => {
         }
         return href;
       });
-      localStorage.setItem(key, JSON.stringify([...readedURLs, ...urls]));
-      fetch(`https://www.wdym9816.top/track/${key}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ links: urls }),
-      });
+      if (urls.length) {
+        localStorage.setItem(key, JSON.stringify([...readedURLs, ...urls]));
+        fetch(`https://www.wdym9816.top/track/${key}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ links: urls }),
+        });
+      }
     });
 
   document.querySelector(".nex_Product_unextend")?.remove();
@@ -157,7 +159,7 @@ const postPageInfo = async (url, imgs, realLink = null) => {
       div.style.display = "flex";
       div.style.alignItems = "center";
       let src = div.querySelector("a").style.background.split('"')[1];
-      div.innerHTML = `<img id="aimg_2113312" aid="2113312" src="${src}" class="zoom" onclick="zoom(this, this.src, 0, 0, 0)" width="400" style=" object-fit: cover; height: 300px; " initialized="true">`;
+      div.innerHTML = `<img src="${src}" class="zoom" onclick="zoom(this, this.src, 0, 0, 0)" width="400" style=" object-fit: cover; height: 300px; " initialized="true">`;
       return src;
     });
     postPageInfo(url, imgs);
@@ -174,19 +176,13 @@ const postPageInfo = async (url, imgs, realLink = null) => {
     };
 
     let href = li.querySelector("a:last-of-type").href;
-    console.log(await getPageInfo(href));
-    let realLink = await getRealLink(href);
-    if (realLink) {
-      let doc2 = await get_page(realLink);
-      let imgs = [...doc2.querySelectorAll("img.zoom")].map(
-        (e) => e.attributes.file?.value
-      );
-      postPageInfo(href, imgs, realLink);
-      let imgText = [...doc2.querySelectorAll("img.zoom")]
-        .map((e) => {
-          e.src = e.attributes.file?.value;
-          return e.outerHTML;
-        })
+    let imgs = (await getPageInfo(href))?.imgs?.split(";") || [];
+    if (imgs.length > 0) {
+      let imgText = imgs
+        .map(
+          (src) =>
+            `<img src="${src}" class="zoom" onclick="zoom(this, this.src, 0, 0, 0)" style="height:300px;width:fit-content">`
+        )
         .join("");
       li.insertAdjacentHTML(
         "beforeend",
@@ -196,6 +192,29 @@ const postPageInfo = async (url, imgs, realLink = null) => {
         e.style.height = "300px";
         e.style.width = "fit-content";
       });
+    } else {
+      let realLink = await getRealLink(href);
+      if (realLink) {
+        let doc2 = await get_page(realLink);
+        let imgs = [...doc2.querySelectorAll("img.zoom")].map(
+          (e) => e.attributes.file?.value
+        );
+        postPageInfo(href, imgs, realLink);
+        let imgText = [...doc2.querySelectorAll("img.zoom")]
+          .map((e) => {
+            e.src = e.attributes.file?.value;
+            return e.outerHTML;
+          })
+          .join("");
+        li.insertAdjacentHTML(
+          "beforeend",
+          `<div style="overflow:auto"><div style="display: flex; flex-wrap:no-wrap">${imgText}</div></div>`
+        );
+        li.querySelectorAll("img.zoom").forEach((e) => {
+          e.style.height = "300px";
+          e.style.width = "fit-content";
+        });
+      }
     }
   });
 
