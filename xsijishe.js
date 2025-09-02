@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         xsijishe
 // @namespace    http://tampermonkey.net/
-// @version      20250823
+// @version      20250902
 // @description  try to take over the world!
 // @author       You
 // @match        https://xsijishe.com/*
@@ -86,39 +86,28 @@ const getPageInfo = async (url) => {
   }
 };
 
-const postPageInfo = async (url, imgs, realLink = null) => {
+const postPageInfo = async (pageInfos) => {
   let key = location.host.split(".")[0];
   return fetch(`https://www.wdym9816.top/track/${key}/page`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      url: url,
-      realLink: realLink,
-      imgs: imgs.join(";"),
-    }),
+    body: JSON.stringify(pageInfos),
   });
 };
 
-const getReadedLink = async () => {
-  let key = location.host.split(".")[0];
-  return fetch(`https://www.wdym9816.top/track/${key}`).then((res) => {
-    return res?.json();
-  });
-};
-
-const postReadedLink = async (urls) => {
+const getReadStatus = async (urls) => {
   let key = location.host.split(".")[0];
   return fetch(`https://www.wdym9816.top/track/${key}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ links: urls }),
-  });
+    body: JSON.stringify(urls),
+  }).then((res) => res.json());
 };
 
 const getImgText = async (href) => {
   let imgText = "";
   let imgs = (await getPageInfo(href))?.imgs;
-  if (imgs?.length) {
+  if (imgs?.includes("http")) {
     imgText = imgs
       .split(";")
       .map(
@@ -133,7 +122,7 @@ const getImgText = async (href) => {
       let imgs = [...doc2.querySelectorAll("img.zoom")].map(
         (e) => e.attributes.file?.value || e?.src
       );
-      postPageInfo(href, imgs, realLink);
+      postPageInfo([{ url: href, realLink, imgs }]);
       imgText = [...doc2.querySelectorAll("img.zoom")]
         .map((e) => {
           e.src = e.attributes.file?.value || e?.src;
@@ -146,20 +135,16 @@ const getImgText = async (href) => {
 };
 
 (function () {
-  getReadedLink().then((readedURLs) => {
-    readedURLs = new Set(readedURLs || []);
-    let urls = [...document.querySelectorAll(".nex_forumtit_top>a.s.xst")].map(
-      (a) => {
-        let href = a.href;
-        if (readedURLs.has(href)) {
-          a.style.color = "#999";
-        }
-        return href;
+  let elms = [...document.querySelectorAll(".nex_forumtit_top>a.s.xst")];
+  let urls = elms.map((a) => a.href);
+  getReadStatus(urls).then((unReadedURLs) => {
+    unReadedURLs = new Set(unReadedURLs || []);
+    elms.forEach((a) => {
+      let href = a.href;
+      if (!unReadedURLs.has(href)) {
+        a.style.color = "#999";
       }
-    );
-    if (urls.length) {
-      postReadedLink(urls);
-    }
+    });
   });
 
   document.querySelector(".nex_Product_unextend")?.remove();
@@ -176,6 +161,8 @@ const getImgText = async (href) => {
   document
     .querySelectorAll(".ct2>.mn")
     .forEach((e) => e.style.setProperty("width", "1150px", "important"));
+
+  let pageInfos = [];
   document.querySelectorAll(".nex_forumlist_pics>ul").forEach((ul) => {
     let url = ul.parentElement.parentElement.querySelector("a").href;
     ul.parentElement.style.width = "100%";
@@ -198,7 +185,7 @@ const getImgText = async (href) => {
       return src;
     });
     if (imgs.length > 0) {
-      postPageInfo(url, imgs);
+      pageInfos.push({ url, imgs });
     } else {
       getImgText(url).then((imgText) => {
         if (imgText) {
@@ -214,6 +201,7 @@ const getImgText = async (href) => {
       });
     }
   });
+  postPageInfo(pageInfos);
 
   document.querySelectorAll("#k_favorite").forEach((a) => {
     a.onclick = () => addFav(a.href).then(() => a.remove());
