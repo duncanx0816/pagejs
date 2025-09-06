@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         AVview
 // @namespace    http://tampermonkey.net/
-// @version      2024-06-08
+// @version      2025-09-06
 // @description  try to take over the world!
 // @author       You
 // @match        http*://*/pw/*
@@ -15,29 +15,6 @@
 // @match        http*://*/link.aspx?hash=*
 // @match        https://*/list.php?name=*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=q0519.cc
-// @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js
-// @grant        unsafeWindow
-// @grant        GM_addStyle
-// @grant        GM_deleteValue
-// @grant        GM_listValues
-// @grant        GM_addValueChangeListener
-// @grant        GM_removeValueChangeListener
-// @grant        GM_setValue
-// @grant        GM_getValue
-// @grant        GM_log
-// @grant        GM_getResourceText
-// @grant        GM_getResourceURL
-// @grant        GM_registerMenuCommand
-// @grant        GM_unregisterMenuCommand
-// @grant        GM_openInTab
-// @grant        GM_xmlhttpRequest
-// @grant        GM_download
-// @grant        GM_getTab
-// @grant        GM_saveTab
-// @grant        GM_getTabs
-// @grant        GM_notification
-// @grant        GM_setClipboard
-// @grant        GM_info
 // ==/UserScript==
 
 unsafeWindow.setpos=()=>{};
@@ -64,7 +41,7 @@ const parse = async (css) => {
         });
 
     if(avs.length){
-        let url_ = "https://www.wdym9816.top:444/api/update/av2048/";
+        let url_ = "https://www.wdym9816.top/api/update/av2048/";
         return fetch(url_, {
             method: "POST",
             mode: "cors",
@@ -75,7 +52,9 @@ const parse = async (css) => {
 };
 
 (function() {
-    'use strict';
+    document.querySelector('#diy_chart')?.remove();
+    document.querySelectorAll('tbody:has(.closeprev)').forEach(e=>e.remove());
+
     [
         ["#threadlisttableid th.common a.s.xst", "td.t_f img"],
         ["#main tr.tr3.t_one td h3>a", "div.tpc_content img"],
