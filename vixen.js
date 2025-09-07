@@ -15,6 +15,7 @@
 // @match        https://www.deeper.com/*
 // @match        https://www.slayed.com/*
 // @match        https://www.milfy.com/*
+// @match        https://www.wifey.com/*
 // @run-at       document-start
 // @grant        none
 // ==/UserScript==
