@@ -57,15 +57,38 @@ const main = async () => {
   let info = JSON.parse(
     document.querySelector("script#__NEXT_DATA__").innerHTML
   );
-  let props = await fetch(
-    `${location.origin}/_next/data/${info.buildId}/videos.json${location.search}`
-  ).then((res) => res.json());
-  let videos = props.pageProps.edges.map((edge) => {
-    let { id, title, slug, site, releaseDate, modelsSlugged } = edge.node;
-    let cover = edge.node.images.listing.at(-1).webp.highdpi.double;
+
+  let videos = [];
+  if (info.page == "/videos/[slug]") {
+    let { id, title, slug, releaseDate, modelsSlugged } =
+      info.props.pageProps.video;
+    let cover =
+      info.props.pageProps.video.images.poster.at(-1).webp.highdpi.double;
     cover = cover.split("_")[0] + "_3840x2160.jpeg";
-    return { id, title, slug, site, releaseDate, cover, models: modelsSlugged };
-  });
+    let site = location.host.split(".")[1];
+    videos = [
+      { id, title, slug, site, releaseDate, cover, models: modelsSlugged },
+    ];
+  } else {
+    let props = await fetch(
+      `${location.origin}/_next/data/${info.buildId}/videos.json${location.search}`
+    ).then((res) => res.json());
+    videos = props.pageProps.edges.map((edge) => {
+      let { id, title, slug, site, releaseDate, modelsSlugged } = edge.node;
+      let cover = edge.node.images.listing.at(-1).webp.highdpi.double;
+      cover = cover.split("_")[0] + "_3840x2160.jpeg";
+      return {
+        id,
+        title,
+        slug,
+        site,
+        releaseDate,
+        cover,
+        models: modelsSlugged,
+      };
+    });
+  }
+
   let videoStatus = await fetch("https://www.wdym9816.top/api/vixen", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -95,16 +118,16 @@ const main = async () => {
 };
 
 (function () {
-  if (location.pathname == "/videos") {
-    main().then(() => {
-      let observer = new MutationObserver(async () => {
-        console.log(`changed: ${new Date().getTime()}`);
-        main();
-      });
+  main().then(() => {
+    let observer = new MutationObserver(async () => {
+      console.log(`changed: ${new Date().getTime()}`);
+      main();
+    });
+    if (document.querySelector('[data-test-component="Pagination"]')) {
       observer.observe(
         document.querySelector('[data-test-component="Pagination"]'),
         { childList: true }
       );
-    });
-  }
+    }
+  });
 })();
