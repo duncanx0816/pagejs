@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         vixen
 // @namespace    http://tampermonkey.net/
-// @version      2025-07-06
+// @version      2025-09-06
 // @description  try to take over the world!
 // @author       You
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=vixen.com
@@ -20,210 +20,90 @@
 // ==/UserScript==
 
 const get_page = async (url) => {
-    let res = await fetch(url).then((res) => res.text());
-    return new DOMParser().parseFromString(res, "text/html");
+  let res = await fetch(url).then((res) => res.text());
+  return new DOMParser().parseFromString(res, "text/html");
 };
 
-class Vixen {
-    constructor() {
-        this.studio = location.host.split(".")[1];
-        this.videos = JSON.parse(localStorage.getItem("videos") || "{}");
-        this.info = JSON.parse(
-            document.querySelector("script#__NEXT_DATA__").innerHTML
-        );
-        this.buildId = this.info.buildId;
-        if (this.info.page == "/videos/[slug]") {
-            this.run_detail();
-        }
-        if (this.info.page == "/videos") {
-            this.run();
-        }
-    }
+const until = async (expr, ntime = 20, delta = 3000) => {
+  return new Promise((resolve, reject) => {
+    let timer = setInterval(() => {
+      if (eval(expr) || --ntime < 0) {
+        clearInterval(timer);
+        resolve(eval(expr));
+      }
+    }, delta);
+  });
+};
 
-    run_detail = async () => {
-        let img_url =
-            this.info.props.pageProps.video.images.poster.slice(-1)[0].webp.highdpi
-                .double;
-        img_url = new URL(img_url, location);
-        console.log(img_url.href);
-        window.open(img_url.href);
-        await this.update();
-    };
-
-    run = async () => {
-        if (document.querySelector("div.VideosSidebar__Main-sc-11jbuek-1.AJrQs")) {
-            document.querySelector(
-                "div.VideosSidebar__Main-sc-11jbuek-1.AJrQs"
-            ).style.display = "none";
-        }
-        this.changeLink();
-        await Promise.all(this.info.props.pageProps.edges.map(this.parseVideo));
-        let nVideo = Object.keys(this.videos).length;
-        localStorage.setItem("videos", JSON.stringify(this.videos));
-
-        await this.update();
-
-        let blob = new Blob([JSON.stringify(this.info)], {
-            type: "application/json",
-        });
-        let a = document.createElement("a");
-        a.download = `${this.studio}.${new Date().getTime()}.${nVideo}.json`;
-        a.href = URL.createObjectURL(blob);
-        // a.click();
-
-        console.log(`done: ${nVideo}`);
-        // confirm(`done: ${nVideo}`)
-    };
-
-    changeLink = async () => {
-        [
-            ...document.querySelectorAll(
-                '[data-test-component="VideoThumbnailContainer"]'
-            ),
-        ].map(async (div) => {
-            let a = div.querySelector("a");
-            let { status, link } = await fetch(
-                "https://www.wdym9816.top/api/vixen/video/?" +
-                new URLSearchParams({
-                    studio: location.host.split('.')[1],
-                    title: a.title,
-                }).toString()
-            ).then((res) => res.json());
-            a.href = `potplayer://${link}`;
-            if (status != "done") {
-                a.href = link;
-                a.innerHTML = `<i class="fa-solid fa-magnet" style="font-size: 18px;color: blue;"></i> ${a.innerText}`;
-            } else if (link.endsWith('.mkv')) {
-                a.innerHTML = `<i class="fa-solid fa-video" style="font-size: 18px;color: green;"></i> ${a.innerText}`;
-            } else {
-                a.innerHTML = `<i class="fa-solid fa-video" style="font-size: 18px;color: blue;"></i> ${a.innerText}`;
-            }
-            a.onclick = (e) => {
-                window.open(e.target.href, "_blank");
-                return false;
-            };
-        });
-    };
-
-    parseVideo = async (elm) => {
-        let slug = elm.node.slug;
-        let doc = await get_page(`/videos/${slug}`);
-        let img_url = new URL(
-            doc.querySelector("picture>source").srcset.split(" ")[0]
-        );
-        img_url.pathname = img_url.pathname.split("_")[0] + "_3840x2160.jpeg";
-
-        if (!(slug in this.videos)) {
-            setTimeout(() => {
-                window.open(img_url.href);
-            }, parseInt(Math.random() * 1000));
-        }
-        this.videos[slug] = img_url;
-    };
-
-    parseVideo2 = async (elm) => {
-        let slug = elm
-            .querySelector(
-                ".VideoThumbnailPreview__VideoThumbnailLink-sc-1l0c3o7-8.cuAzUN"
-            )
-            .href.split("/")
-            .slice(-1)[0];
-        let url_detail = `/_next/data/${this.buildId}/videos/${slug}.json?slug=${slug}`;
-        let detail = await fetch(url_detail).then((resp) => resp.json());
-        let { title, videoId, uuid, releaseDate, modelsSlugged } =
-            detail.pageProps.video;
-        releaseDate = releaseDate.split("T")[0];
-
-        let img_url =
-            detail.pageProps.video.images.poster.slice(-1)[0].webp.highdpi.double;
-        img_url = new URL(img_url, location);
-        let poster = img_url.pathname.split("/").slice(-1)[0];
-
-        if (!(uuid in this.videos)) {
-            setTimeout(() => {
-                window.open(img_url.href);
-            }, parseInt(Math.random() * 1000));
-        }
-        this.videos[uuid] = {
-            title,
-            slug,
-            videoId,
-            releaseDate,
-            poster,
-            modelsSlugged,
-        };
-    };
-
-    update = () => {
-        console.log(this.info);
-        let url = "https://www.wdym9816.top/api/update/vixen/";
-        return fetch(url, {
-            method: "POST",
-            mode: "cors",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(this.info),
-        }).then((res) => {
-            if (res.ok) {
-                this.info = [];
-            }
-        });
-    };
-}
-
-async function until(expr, ntime = 20, delta = 3000) {
-    return new Promise((resolve, reject) => {
-        let timer = setInterval(() => {
-            if (eval(expr) || --ntime < 0) {
-                clearInterval(timer);
-                resolve(eval(expr));
-            }
-        }, delta);
-    });
-}
-
-(async function () {
-    "use strict";
-    until('document.body', delta=1000);
+const main = async () => {
+  until(`document.body`).then(() => {
     let script = document.createElement("script");
     script.src = "https://kit.fontawesome.com/0f14166b22.js";
     document.body.appendChild(script);
+  });
 
-    let el = document.querySelector('[data-test-component="AgeVerificationOverlay"]')
-    if(el){
-        el.style.display='none'
-    }
+  await until(`document.querySelector('script#__NEXT_DATA__')`);
 
-    el = document.querySelector(
-        ".AgeVerificationModal__EnterButton-sc-578udq-11"
-    );
-    if (el) {
-        el.click();
-    }
-    await until(`document.querySelector('script#__NEXT_DATA__')`);
-    console.log(
-        JSON.parse(document.querySelector("script#__NEXT_DATA__").innerHTML).buildId
-    );
-    new Vixen();
+  document
+    .querySelector('[data-test-component="AgeVerificationOverlay"]')
+    ?.remove();
 
-    if (location.pathname == "/videos") {
-        let observer = new MutationObserver(async () => {
-            console.log(`changed: ${new Date().getTime()}`);
-            console.log(
-                JSON.parse(document.querySelector("script#__NEXT_DATA__").innerHTML)
-                    .buildId
-            );
-            await until(
-                `document.querySelector('div.SharedPagination__PaginationContainer-sc-1t976vd-0.ferMtn')`
-            );
-            new Vixen();
-        });
-        observer.observe(
-            document.querySelector(
-                "div.SharedPagination__PaginationContainer-sc-1t976vd-0.ferMtn"
-            ),
-            {
-                childList: true,
-            }
-        );
-    }
+  document
+    .querySelector(".AgeVerificationModal__EnterButton-sc-578udq-11")
+    ?.click();
+
+  document.querySelector('[data-test-component="Sidebar"]')?.remove();
+
+  let info = JSON.parse(
+    document.querySelector("script#__NEXT_DATA__").innerHTML
+  );
+  let props = await fetch(
+    `${location.origin}/_next/data/${info.buildId}/videos.json${location.search}`
+  ).then((res) => res.json());
+  let videos = props.pageProps.edges.map((edge) => {
+    let { id, title, slug, site, releaseDate, modelsSlugged } = edge.node;
+    let cover = edge.node.images.listing.at(-1).webp.highdpi.double;
+    return { id, title, slug, site, releaseDate, cover, models: modelsSlugged };
+  });
+  let videoStatus = await fetch("https://www.wdym9816.top/api/vixen", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(videos),
+  }).then((res) => res.json());
+
+  document
+    .querySelectorAll('[data-test-component="VideoThumbnailContainer"]')
+    .forEach(async (div) => {
+      let a = div.querySelector("a");
+      let slug = a.href.split("/").at(-1);
+      let { status, link } = videoStatus[slug];
+      a.href = `potplayer://${link}`;
+      if (status != "found") {
+        a.href = link;
+        a.innerHTML = `<i class="fa-solid fa-magnet" style="font-size: 18px;color: blue;"></i> ${a.innerText}`;
+      } else if (link.endsWith(".mkv")) {
+        a.innerHTML = `<i class="fa-solid fa-video" style="font-size: 18px;color: green;"></i> ${a.innerText}`;
+      } else {
+        a.innerHTML = `<i class="fa-solid fa-video" style="font-size: 18px;color: blue;"></i> ${a.innerText}`;
+      }
+      a.onclick = (e) => {
+        window.open(e.target.href, "_blank");
+        return false;
+      };
+    });
+};
+
+(function () {
+  if (location.pathname == "/videos") {
+    main().then(() => {
+      let observer = new MutationObserver(async () => {
+        console.log(`changed: ${new Date().getTime()}`);
+        main();
+      });
+      observer.observe(
+        document.querySelector('[data-test-component="Pagination"]'),
+        { childList: true }
+      );
+    });
+  }
 })();
