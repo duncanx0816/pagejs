@@ -63,6 +63,7 @@ const main = async () => {
   let videos = props.pageProps.edges.map((edge) => {
     let { id, title, slug, site, releaseDate, modelsSlugged } = edge.node;
     let cover = edge.node.images.listing.at(-1).webp.highdpi.double;
+    cover = cover.split("_")[0] + "_3840x2160.jpeg";
     return { id, title, slug, site, releaseDate, cover, models: modelsSlugged };
   });
   let videoStatus = await fetch("https://www.wdym9816.top/api/vixen", {
