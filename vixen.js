@@ -25,7 +25,7 @@ const get_page = async (url) => {
   return new DOMParser().parseFromString(res, "text/html");
 };
 
-const until = async (expr, ntime = 20, delta = 3000) => {
+const until = async (expr, ntime = 20, delta = 1000) => {
   return new Promise((resolve, reject) => {
     let timer = setInterval(() => {
       if (eval(expr) || --ntime < 0) {
@@ -43,17 +43,25 @@ const main = async () => {
     document.body.appendChild(script);
   });
 
+  until(
+    `document.querySelector('[data-test-component="AgeVerificationOverlay"]')`
+  ).then(() => {
+    document
+      .querySelector('[data-test-component="AgeVerificationOverlay"]')
+      ?.remove();
+  });
+
+  until(`document.querySelector('[data-test-component="Sidebar"]')`).then(
+    () => {
+      document.querySelector('[data-test-component="Sidebar"]')?.remove();
+    }
+  );
+
+  until(`document.querySelector('.dIuvFW')`).then(() => {
+    document.querySelector(".dIuvFW").style.paddingBottom = 0;
+  });
+
   await until(`document.querySelector('script#__NEXT_DATA__')`);
-
-  document
-    .querySelector('[data-test-component="AgeVerificationOverlay"]')
-    ?.remove();
-
-  document
-    .querySelector(".AgeVerificationModal__EnterButton-sc-578udq-11")
-    ?.click();
-
-  document.querySelector('[data-test-component="Sidebar"]')?.remove();
 
   let info = JSON.parse(
     document.querySelector("script#__NEXT_DATA__").innerHTML
@@ -116,6 +124,8 @@ const main = async () => {
         return false;
       };
     });
+
+  document.querySelector('[data-test-component="Sidebar"]')?.remove();
 };
 
 (function () {
