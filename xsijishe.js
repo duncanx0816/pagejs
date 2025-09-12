@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         xsijishe
 // @namespace    http://tampermonkey.net/
-// @version      20250902
+// @version      20250912
 // @description  try to take over the world!
 // @author       You
 // @match        https://xsijishe.com/*
@@ -135,6 +135,14 @@ const getImgText = async (href) => {
 };
 
 (function () {
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "ArrowRight") {
+      document.querySelector(".nxt")?.click();
+    } else if (event.key === "ArrowLeft") {
+      document.querySelector(".prev")?.click();
+    }
+  });
+  
   let elms = [...document.querySelectorAll(".nex_forumtit_top>a.s.xst")];
   let urls = elms.map((a) => a.href);
   getReadStatus(urls).then((unReadedURLs) => {
