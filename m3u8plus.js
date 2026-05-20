@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         m3u8DL
+// @name         m3u8plus
 // @namespace    http://tampermonkey.net/
-// @version      2026-05-19
+// @version      2026-05-20
 // @description  try to take over the world!
 // @author       You
 // @match        https://xhamster.com/*
@@ -11,8 +11,8 @@
 // ==/UserScript==
 
 const remoteDownload = (url) => {
-  const baseUrl = "https://www.wdym9816.top/track/download";
-  const params = { url: url, siteID: document.location.hostname.split('.').at(-2) };
+  const baseUrl = "https://www.wdym9816.top/track/m3u8";
+  const params = { url: url};
   const urlWithParams = `${baseUrl}?${new URLSearchParams(params)}`;
   fetch(urlWithParams);
 }
