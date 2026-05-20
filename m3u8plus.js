@@ -39,7 +39,7 @@ const remoteDownload = (event) => {
         remoteDownload(e);
       }
     },
-    true,
+    true, // 在“捕获阶段”（Capture Phase）触发
   );
   
 })();
