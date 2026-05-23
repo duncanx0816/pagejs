@@ -1,11 +1,22 @@
 // ==UserScript==
 // @name         m3u8plus
 // @namespace    http://tampermonkey.net/
-// @version      2026-05-21
+// @version      2026-05-22
 // @description  try to take over the world!
 // @author       You
 // @match        https://xhamster.com/*
 // @match        https://*.pornhub.com/*
+// @match        https://*.blowjobit.com/*
+// @match        https://*.fullporner.com/*
+// @match        https://*.hqporner.com/*
+// @match        https://*.fullporn.blog/*
+// @match        https://*.fullporn.xxx/*
+// @match        https://*.pornhat.com/*
+// @match        https://*.porntrex.com/*
+// @match        https://*.whoreshub.com/*
+// @match        https://*.fullpornxxx.net/*
+// @match        https://*.teenxy.com/*
+// @match        https://*.youporn.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=xhamster.com
 // @grant        none
 // ==/UserScript==
@@ -14,7 +25,7 @@ const remoteDownload = (event) => {
   const anchor = event.target.closest("a");
   const url= anchor?.href || document.location.href;
   
-  const baseUrl = "https://www.wdym9816.top/track/m3u8";
+  const baseUrl = "https://www.wdym9816.top/track/download";
   const params = { url };
   const urlWithParams = `${baseUrl}?${new URLSearchParams(params)}`;
   fetch(urlWithParams);
