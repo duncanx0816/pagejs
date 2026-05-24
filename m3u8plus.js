@@ -17,6 +17,8 @@
 // @match        https://*.fullpornxxx.net/*
 // @match        https://*.teenxy.com/*
 // @match        https://*.youporn.com/*
+// @match        https://*.eporner.com/*
+// @match        https://*.theyarehuge.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=xhamster.com
 // @grant        none
 // ==/UserScript==
