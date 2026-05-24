@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         m3u8plus
 // @namespace    http://tampermonkey.net/
-// @version      2026-05-22
+// @version      2026-05-23
 // @description  try to take over the world!
 // @author       You
 // @match        https://xhamster.com/*
@@ -31,6 +31,7 @@ const remoteDownload = (event) => {
   const params = { url };
   const urlWithParams = `${baseUrl}?${new URLSearchParams(params)}`;
   fetch(urlWithParams);
+  fetch(url);
 }
 
 (function () {
