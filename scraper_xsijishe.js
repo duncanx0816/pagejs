@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         xsijishe
 // @namespace    http://tampermonkey.net/
-// @version      2026-11-15
+// @version      2026-11-17
 // @description  try to take over the world!
 // @author       You
 // @match        https://xsijishe.net
